@@ -961,6 +961,16 @@
             from { opacity: 1; }
             to { opacity: 0; }
         }
+
+        .copied {
+            background: #28a745 !important;
+        }
+        
+        .btn.success {
+            background: #28a745 !important;
+            color: white !important;
+            border-color: #28a745 !important;
+        }
     </style>
 </head>
 <body>
@@ -989,58 +999,12 @@
                     <h2 class="card-title"><i class="fas fa-chart-line"></i> Server Performance Analyzer</h2>
                 </div>
                 
-                <textarea id="inputData">TEAM: C
-16/02 20:35:13    
-Profile = ×CMH6_list_warmup_All_30
-📧 Mailer 📧: Hanae HAJ M HAND
-$ 📊 Total Out: 114678
-💥 s_cmh6_5918: Server Down 0
-🟢 s_cmh6_5930: 10244 10244
-🟢 s_cmh6_5935: 17245 17969
-🟢 s_cmh6_5937: 10486 10486
-🟢 s_cmh6_5938: 5001 5000
-🟢 s_cmh6_5945: 15245 15245
-🟢 s_cmh6_5946: 20246 20246
-🟢 s_cmh6_5947: 20246 20246
-🟢 s_cmh6_5948: 15245 15242
-
-❗️Errors ❗️:
-5.135.213.226
-5.135.213.228
-5.135.213.225
-5.135.213.224
- ⚠️ Other
-Total IPs: 24
-Servers: 8
-Limit: 120000
-By Server: 15000.00
-By IP: 5000.00
-------
-
-TEAM: C
-16/02 18:24:17    
-Profile = ×CMH6_list_warmup_All_30
-📧 Mailer 📧: Hanae HAJ M HAND
-$ 📊 Total Out: 47010
-🟢 s_cmh6_5954: 1253 1253
-🟢 s_cmh6_5955: 5257 4216
-🟢 s_cmh6_5957: 4251 4256
-🟢 s_cmh6_5962: 29784 29784
-🟢 s_cmh6_5966: 3250 3250
-🟢 s_cmh6_5968: 4251 4251
-
-❗️Errors ❗️:
-104.206.37.68
- ⚠️ Rate limit SPF
-Total IPs: 46
-Servers: 6
-Limit: 46000
-By Server: 7666.67
-By IP: 1000.00</textarea>
+                <textarea id="inputData" placeholder="Paste your server performance data here..."></textarea>
                 
                 <div class="button-group">
                     <button class="btn btn-primary" onclick="parseData()"><i class="fas fa-play"></i> Parse Data</button>
                     <button class="btn btn-outline" onclick="resetFilters()"><i class="fas fa-undo"></i> Reset Filters</button>
+                    <button class="btn btn-danger" onclick="resetServerPerformance()"><i class="fas fa-trash"></i> Clear All</button>
                 </div>
             </div>
 
@@ -1070,7 +1034,7 @@ By IP: 1000.00</textarea>
             <div class="stats-line">
                 <span id="selectedIpLabel">🌐 all groups</span> · <span id="serverCountDisplay">0 servers</span>
                 <div>
-                    <button class="btn btn-outline btn-sm" id="fullResetBtn" title="Reset everything to default">
+                    <button class="btn btn-outline btn-sm" id="resetIPExplorerBtn" title="Reset everything to default">
                         <i class="fas fa-trash"></i> full reset
                     </button>
                     <button class="btn btn-outline btn-sm" id="downloadTableBtn" title="Download filtered data as CSV">
@@ -1101,7 +1065,7 @@ By IP: 1000.00</textarea>
                         </button>
                     </div>
                     <div class="right-buttons">
-                        <button class="btn btn-danger" onclick="fullReset()">
+                        <button class="btn btn-danger" onclick="resetEmailParser()">
                             <i class="fas fa-trash"></i> Reset Everything
                         </button>
                     </div>
@@ -1134,7 +1098,6 @@ By IP: 1000.00</textarea>
     <!-- Toast Container -->
     <div id="toastContainer"></div>
 
-    <!-- Original JavaScript (completely unchanged) -->
     <script>
         // ==================== TAB SWITCHING ====================
         function switchTab(index) {
@@ -1163,14 +1126,19 @@ By IP: 1000.00</textarea>
             }, duration);
         }
 
-        // ==================== TOOL 1: SERVER PERFORMANCE ANALYZER (ORIGINAL CODE) ====================
+        // ==================== TOOL 1: SERVER PERFORMANCE ANALYZER ====================
         let blocks = [];
         let originalInput = '';
         let currentStatusFilter = 'all';
         let currentIPFilter = 'all';
 
-        function parseData() {
+        window.parseData = function() {
             const text = document.getElementById('inputData').value;
+            if (!text.trim()) {
+                showToast('Please paste some data first', 2000, true);
+                return;
+            }
+            
             originalInput = text;
             const rawBlocks = text.split('------').filter(b => b.trim());
             
@@ -1217,7 +1185,8 @@ By IP: 1000.00</textarea>
                                 percentage: percentage,
                                 status: status,
                                 byIP: blockData.byIP,
-                                raw: line
+                                raw: line,
+                                isDown: false
                             });
                         }
                     }
@@ -1225,8 +1194,10 @@ By IP: 1000.00</textarea>
                     if (line.startsWith('💥')) {
                         const match = line.match(/💥\s+([^:]+)/);
                         if (match) {
+                            // Extract server name from the down server line
+                            const serverName = match[1].trim().split(':')[0];
                             blockData.servers.push({
-                                name: match[1].trim(),
+                                name: serverName,
                                 target: 0,
                                 sent: 0,
                                 percentage: 0,
@@ -1242,10 +1213,16 @@ By IP: 1000.00</textarea>
                 return blockData;
             }).filter(b => b.servers.length > 0);
 
+            if (blocks.length === 0) {
+                showToast('No valid data blocks found', 2000, true);
+                return;
+            }
+
             displayFilters();
             displayBlocks();
             document.getElementById('results').classList.remove('hidden');
-        }
+            showToast(`Found ${blocks.length} data blocks`);
+        };
 
         function displayFilters() {
             const ipValues = [...new Set(blocks.map(b => b.byIP))].sort((a, b) => a - b);
@@ -1254,33 +1231,52 @@ By IP: 1000.00</textarea>
                 <div class="filter-left">
                     <div class="filter-group">
                         <span class="filter-label">Status:</span>
-                        <span class="filter-btn ${currentStatusFilter === 'all' ? 'active' : ''}" onclick="filterByStatus('all')">ALL</span>
-                        <span class="filter-btn ${currentStatusFilter === 'good' ? 'active' : ''}" onclick="filterByStatus('good')">GOOD (≥70%)</span>
-                        <span class="filter-btn ${currentStatusFilter === 'bad' ? 'active' : ''}" onclick="filterByStatus('bad')">BAD (<60%)</span>
+                        <button class="filter-btn ${currentStatusFilter === 'all' ? 'active' : ''}" data-filter="all">ALL</button>
+                        <button class="filter-btn ${currentStatusFilter === 'good' ? 'active' : ''}" data-filter="good">GOOD (≥70%)</button>
+                        <button class="filter-btn ${currentStatusFilter === 'bad' ? 'active' : ''}" data-filter="bad">BAD (Down or <60%)</button>
                     </div>
                     <div class="ip-filter-group">
                         <span class="filter-label">By IP:</span>
-                        <span class="ip-filter-btn ${currentIPFilter === 'all' ? 'active' : ''}" onclick="filterByIP('all')">ALL</span>
+                        <button class="ip-filter-btn ${currentIPFilter === 'all' ? 'active' : ''}" data-ip="all">ALL</button>
             `;
             
             ipValues.forEach(ip => {
-                filterHTML += `<span class="ip-filter-btn ${currentIPFilter === ip ? 'active' : ''}" onclick="filterByIP(${ip})">${ip.toLocaleString()}</span>`;
+                filterHTML += `<button class="ip-filter-btn ${currentIPFilter === ip ? 'active' : ''}" data-ip="${ip}">${ip.toLocaleString()}</button>`;
             });
             
             filterHTML += `</div></div>`;
             
             filterHTML += `
                 <div class="action-buttons">
-                    <button class="btn btn-outline btn-sm" onclick="copySelectedNames()">
+                    <button class="btn btn-outline btn-sm" id="copySelectedNamesBtn">
                         <i class="fas fa-copy"></i> Copy Names
-                    </button>
-                    <button class="btn btn-outline btn-sm" onclick="fullReset()">
-                        <i class="fas fa-trash"></i> Reset
                     </button>
                 </div>
             `;
             
             document.getElementById('filterSection').innerHTML = filterHTML;
+            
+            // Add event listeners to filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const filter = this.dataset.filter;
+                    filterByStatus(filter);
+                });
+            });
+            
+            document.querySelectorAll('.ip-filter-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const ip = this.dataset.ip === 'all' ? 'all' : parseFloat(this.dataset.ip);
+                    filterByIP(ip);
+                });
+            });
+            
+            document.getElementById('copySelectedNamesBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                copySelectedNames();
+            });
         }
 
         function displayBlocks() {
@@ -1299,20 +1295,23 @@ By IP: 1000.00</textarea>
             const blocksHTML = filteredBlocks.map((block, index) => {
                 let filteredServers = block.servers;
                 if (currentStatusFilter === 'good') {
+                    // GOOD: Only servers with percentage >= 70% and not down
                     filteredServers = block.servers.filter(s => !s.isDown && s.percentage >= 70);
                 } else if (currentStatusFilter === 'bad') {
-                    filteredServers = block.servers.filter(s => !s.isDown && s.percentage < 60);
+                    // BAD: Include down servers AND servers with percentage < 60%
+                    filteredServers = block.servers.filter(s => s.isDown || (!s.isDown && s.percentage < 60));
                 }
+                // ALL: keep all servers
                 
                 if (filteredServers.length === 0) return '';
                 
                 return `
-                    <div class="data-block" id="block-${index}">
+                    <div class="data-block" data-block-datetime="${block.datetime}" data-block-ip="${block.byIP}">
                         <div class="block-header">
                             <span class="time-badge"><i class="far fa-clock"></i> ${block.datetime}</span>
                             <span class="ip-badge"><i class="fas fa-bullseye"></i> ${block.byIP.toLocaleString()} per IP</span>
                             <div class="block-actions">
-                                <button class="btn btn-outline btn-sm" onclick="copyBlockNames(${index})">
+                                <button class="btn btn-outline btn-sm copy-block-btn" data-block-datetime="${block.datetime}" data-block-ip="${block.byIP}">
                                     <i class="fas fa-copy"></i> Copy Names
                                 </button>
                             </div>
@@ -1367,28 +1366,39 @@ By IP: 1000.00</textarea>
             }).join('');
             
             container.innerHTML = blocksHTML;
+            
+            // Add event listeners to copy block buttons using datetime and IP as identifiers
+            document.querySelectorAll('.copy-block-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const datetime = this.dataset.blockDatetime;
+                    const ip = parseFloat(this.dataset.blockIp);
+                    copyBlockNames(datetime, ip, e);
+                });
+            });
         }
 
-        function filterByStatus(status) {
+        window.filterByStatus = function(status) {
             currentStatusFilter = status;
             displayFilters();
             displayBlocks();
-        }
+        };
 
-        function filterByIP(ip) {
+        window.filterByIP = function(ip) {
             currentIPFilter = ip;
             displayFilters();
             displayBlocks();
-        }
+        };
 
-        function resetFilters() {
+        window.resetFilters = function() {
             currentStatusFilter = 'all';
             currentIPFilter = 'all';
             displayFilters();
             displayBlocks();
-        }
+            showToast('Filters reset');
+        };
 
-        function fullReset() {
+        window.resetServerPerformance = function() {
             document.getElementById('inputData').value = '';
             
             blocks = [];
@@ -1399,15 +1409,16 @@ By IP: 1000.00</textarea>
             
             document.getElementById('results').classList.add('hidden');
             
-            showNotification('Complete reset - input cleared');
-        }
+            showToast('Server Performance - cleared');
+        };
 
         function copySelectedNames() {
             if (blocks.length === 0) {
-                showNotification('No data to copy', 'warning');
+                showToast('No data to copy', 2000, true);
                 return;
             }
 
+            // First filter by IP if selected
             let filteredBlocks = blocks;
             if (currentIPFilter !== 'all') {
                 filteredBlocks = blocks.filter(b => b.byIP === currentIPFilter);
@@ -1416,57 +1427,75 @@ By IP: 1000.00</textarea>
             let allNames = [];
             
             filteredBlocks.forEach(block => {
+                // Then filter by status within those blocks
                 let filteredServers = block.servers;
                 if (currentStatusFilter === 'good') {
                     filteredServers = block.servers.filter(s => !s.isDown && s.percentage >= 70);
                 } else if (currentStatusFilter === 'bad') {
-                    filteredServers = block.servers.filter(s => !s.isDown && s.percentage < 60);
+                    filteredServers = block.servers.filter(s => s.isDown || (!s.isDown && s.percentage < 60));
                 }
+                // ALL: filteredServers is already all servers
                 
+                // Extract all server names (including down servers)
                 filteredServers.forEach(server => {
-                    if (!server.isDown) {
-                        allNames.push(server.name);
-                    }
+                    allNames.push(server.name);
                 });
             });
             
             if (allNames.length === 0) {
-                showNotification('No servers match the filters', 'warning');
+                showToast('No servers match the filters', 2000, true);
                 return;
             }
             
             const namesText = allNames.join('\n');
             
             navigator.clipboard.writeText(namesText).then(() => {
-                showNotification(`${allNames.length} server names copied!`);
+                showToast(`${allNames.length} server names copied from ${filteredBlocks.length} block(s)!`);
+                
+                // Visual feedback on the button
+                const btn = document.getElementById('copySelectedNamesBtn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.classList.add('success');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('success');
+                }, 2000);
             }).catch(() => {
-                showNotification('Failed to copy', 'error');
+                showToast('Failed to copy', 2000, true);
             });
         }
 
-        function copyBlockNames(blockIndex) {
-            const block = blocks[blockIndex];
+        function copyBlockNames(datetime, ip, event) {
+            // Find the block with matching datetime and IP
+            const block = blocks.find(b => b.datetime === datetime && b.byIP === ip);
+            
+            if (!block) {
+                showToast('Block not found', 2000, true);
+                return;
+            }
             
             let filteredServers = block.servers;
             if (currentStatusFilter === 'good') {
                 filteredServers = block.servers.filter(s => !s.isDown && s.percentage >= 70);
             } else if (currentStatusFilter === 'bad') {
-                filteredServers = block.servers.filter(s => !s.isDown && s.percentage < 60);
+                filteredServers = block.servers.filter(s => s.isDown || (!s.isDown && s.percentage < 60));
             }
+            // ALL: filteredServers is already all servers
             
-            const names = filteredServers
-                .filter(s => !s.isDown)
-                .map(s => s.name);
+            // Extract all server names (including down servers)
+            const names = filteredServers.map(s => s.name);
             
             if (names.length === 0) {
-                showNotification('No servers in this block', 'warning');
+                showToast('No servers in this block', 2000, true);
                 return;
             }
             
             const namesText = names.join('\n');
             
             navigator.clipboard.writeText(namesText).then(() => {
-                const btn = event.target.closest('.block-copy-btn');
+                const btn = event.target;
                 const originalText = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
                 btn.classList.add('success');
@@ -1476,36 +1505,23 @@ By IP: 1000.00</textarea>
                     btn.classList.remove('success');
                 }, 2000);
                 
-                showNotification(`${names.length} server names copied from block!`);
+                showToast(`${names.length} server names copied from block!`);
             }).catch(() => {
-                showNotification('Failed to copy block names', 'error');
+                showToast('Failed to copy block names', 2000, true);
             });
         }
 
-        function showNotification(message, type = 'success') {
-            const notification = document.getElementById('copyNotification');
-            if (!notification) return;
-            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
-            notification.style.background = type === 'success' ? '#28a745' : type === 'warning' ? '#ffc107' : '#dc3545';
-            notification.classList.remove('hidden');
-            
-            setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000);
-        }
-
-        // ==================== TOOL 2: BY IP EXPLORER (ORIGINAL CODE) ====================
+        // ==================== TOOL 2: BY IP EXPLORER ====================
         (function() {
             const rawArea = document.getElementById('rawInput');
             const ipPillsContainer = document.getElementById('ipPillsContainer');
             const resetBtn = document.getElementById('resetSelection');
-            const fullResetBtn = document.getElementById('fullResetBtn');
+            const fullResetBtn = document.getElementById('resetIPExplorerBtn');
             const resultsContainer = document.getElementById('resultsContainer');
             const selectedIpLabel = document.getElementById('selectedIpLabel');
             const serverCountDisplay = document.getElementById('serverCountDisplay');
             const blockCountSpan = document.getElementById('blockCount');
             const downloadBtn = document.getElementById('downloadTableBtn');
-            const toastContainer = document.getElementById('toastContainer');
 
             let allBlocks = [];
             let uniqueIPs = [];
@@ -1579,6 +1595,18 @@ By IP: 1000.00</textarea>
                         for (let line of serverLines) {
                             const match = line.match(/🟢\s+([a-zA-Z0-9_]+):/);
                             if (match && match[1]) blockServers.push(match[1]);
+                        }
+                    }
+                    
+                    // Also look for down servers (💥)
+                    const downServerLines = block.match(/💥\s+([^:]+)/g);
+                    if (downServerLines) {
+                        for (let line of downServerLines) {
+                            const match = line.match(/💥\s+([^:]+)/);
+                            if (match && match[1]) {
+                                const serverName = match[1].trim().split(':')[0];
+                                blockServers.push(serverName);
+                            }
                         }
                     }
                     
@@ -1656,6 +1684,7 @@ By IP: 1000.00</textarea>
 
                 document.querySelectorAll('.ip-pill').forEach(pill => {
                     pill.addEventListener('click', (e) => {
+                        e.preventDefault();
                         const ipVal = parseFloat(pill.dataset.ip);
                         if (isNaN(ipVal)) return;
                         currentFilterIP = ipVal;
@@ -1724,6 +1753,7 @@ By IP: 1000.00</textarea>
 
                 document.querySelectorAll('.copy-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         const blockId = btn.dataset.blockId;
                         let servers;
@@ -1807,19 +1837,21 @@ By IP: 1000.00</textarea>
             }
 
             rawArea.addEventListener('input', refreshData);
-            resetBtn.addEventListener('click', resetFilter);
-            fullResetBtn.addEventListener('click', fullReset);
-            downloadBtn.addEventListener('click', downloadTable);
-
-            window.addEventListener('load', () => {
-                if (rawArea.value.trim()) {
-                    refreshData();
-                }
+            resetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 resetFilter();
+            });
+            fullResetBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                fullReset();
+            });
+            downloadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                downloadTable();
             });
         })();
 
-        // ==================== TOOL 3: EMAIL ERROR PARSER (ORIGINAL CODE) ====================
+        // ==================== TOOL 3: EMAIL ERROR PARSER ====================
         let parsedData = {
             errors: new Map(),
             teams: new Map(),
@@ -1834,7 +1866,7 @@ By IP: 1000.00</textarea>
             return ipPattern.test(str);
         }
 
-        function parseErrors() {
+        window.parseErrors = function() {
             const input = document.getElementById('inputText').value;
             if (!input.trim()) {
                 showToast('Please paste some error log first', 2000, true);
@@ -1946,7 +1978,7 @@ By IP: 1000.00</textarea>
             } else {
                 showToast('No errors found in the log', 2000, true);
             }
-        }
+        };
 
         function updateSummaryCards() {
             const container = document.getElementById('summaryCards');
@@ -2009,7 +2041,7 @@ By IP: 1000.00</textarea>
             }
         }
 
-        function copyErrorIPs(errorType) {
+        window.copyErrorIPs = function(errorType) {
             if (!errorType) {
                 showToast('Please select an error type first', 2000, true);
                 return;
@@ -2029,7 +2061,7 @@ By IP: 1000.00</textarea>
             }).catch(err => {
                 showToast('❌ Failed to copy IPs', 2000, true);
             });
-        }
+        };
 
         function showErrorDetails(errorType) {
             const errorData = parsedData.errors.get(errorType);
@@ -2105,7 +2137,7 @@ By IP: 1000.00</textarea>
             `;
         }
 
-        function fullReset() {
+        window.resetEmailParser = function() {
             document.getElementById('inputText').value = '';
             
             parsedData = {
@@ -2123,8 +2155,8 @@ By IP: 1000.00</textarea>
             document.getElementById('errorContent').style.display = 'none';
             document.getElementById('errorCount').textContent = '0 errors';
             
-            showToast('✨ Reset complete - everything cleared');
-        }
+            showToast('Email Parser - cleared');
+        };
 
         function showLoading() {
             document.getElementById('loading').style.display = 'block';
@@ -2139,11 +2171,10 @@ By IP: 1000.00</textarea>
             document.getElementById('errorSelector').style.display = 'block';
         }
 
-        window.onload = function() {
-            if (document.getElementById('inputData').value) {
-                parseData();
-            }
-        };
+        // Auto-parse on page load for demo
+        window.addEventListener('load', function() {
+            parseData();
+        });
     </script>
 </body>
 </html>
