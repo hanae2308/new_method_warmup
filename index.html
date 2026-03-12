@@ -1,2623 +1,1240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Tools Collection</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* ========== EXACT COLORS FROM INDEX(9).HTML ========== */
-        :root {
-            --primary: #3a56d4;
-            --primary-light: #5a72e0;
-            --primary-dark: #2a46c4;
-            --secondary: #6c757d;
-            --success: #28a745;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --info: #17a2b8;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --border-radius: 8px;
-            --transition: all 0.2s ease;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background: #f5f7fa;
-            min-height: 100vh;
-            padding: 0;
-            color: var(--dark);
-        }
-
-        /* Dashboard Header */
-        .dashboard-header {
-            background: linear-gradient(135deg, #2a46c4, #3a56d4);
-            color: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        @media (min-width: 768px) {
-            .header-content {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-        }
-
-        .header-left h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .header-left .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .tool-selector {
-            display: flex;
-            gap: 5px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px;
-            border-radius: var(--border-radius);
-            overflow-x: auto;
-        }
-
-        .tool-tab {
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-            flex: 1;
-            justify-content: center;
-            min-width: 140px;
-        }
-
-        .tool-tab:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-        }
-
-        .tool-tab.active {
-            background: white;
-            color: #3a56d4;
-        }
-
-        /* Main Container */
-        .dashboard-container {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-
-        .tool-section {
-            display: none;
-        }
-
-        .tool-section.active {
-            display: block;
-        }
-
-        /* Card Styles */
-        .card {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #eaeaea;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eaeaea;
-        }
-
-        .card-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .card-title i {
-            color: #3a56d4;
-        }
-
-        .badge {
-            background: #3a56d4;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        /* Form Elements */
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: var(--border-radius);
-            font-family: 'Consolas', monospace;
-            font-size: 14px;
-            resize: vertical;
-            margin-bottom: 15px;
-            background: #f8fafc;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #3a56d4;
-            box-shadow: 0 0 0 2px rgba(58, 86, 212, 0.1);
-        }
-
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-outline {
-            background: white;
-            border: 1px solid #cbd5e1;
-            color: #64748b;
-        }
-
-        .btn-outline:hover {
-            background: #f1f5f9;
-            color: #1e293b;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 0.8rem;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            justify-content: space-between;
-        }
-
-        /* Filter Section - Updated for Domain Selector */
-        .filter-section {
-            background: white;
-            border-radius: 10px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .filter-row {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .filter-label {
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 500;
-            min-width: 50px;
-        }
-
-        .filter-btn {
-            padding: 4px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 30px;
-            background: white;
-            color: #1e293b;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .filter-btn:hover {
-            background: #f1f5f9;
-        }
-
-        .filter-btn.active {
-            background: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-        }
-
-        /* IP Filter Group */
-        .ip-filter-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding-left: 15px;
-            border-left: 2px solid #e2e8f0;
-        }
-
-        .ip-filter-btn {
-            padding: 4px 10px;
-            border: 1px solid #f59e0b;
-            border-radius: 30px;
-            background: #fffbeb;
-            color: #b45309;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .ip-filter-btn.active {
-            background: #f59e0b;
-            color: white;
-            border-color: #f59e0b;
-        }
-
-        /* NEW: Domain Filter Group */
-        .domain-filter-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding-left: 15px;
-            border-left: 2px solid #e2e8f0;
-        }
-
-        .domain-filter-btn {
-            padding: 4px 10px;
-            border: 1px solid #10b981;
-            border-radius: 30px;
-            background: #e6f7f0;
-            color: #047857;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .domain-filter-btn.active {
-            background: #10b981;
-            color: white;
-            border-color: #10b981;
-        }
-
-        .domain-badge {
-            background: #10b981;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .no-domain {
-            color: #64748b;
-            font-style: italic;
-        }
-
-        /* Server Selector Section */
-        .server-selector-section {
-            background: white;
-            border-radius: 12px;
-            border: 2px solid #3a56d4;
-            margin: 20px 0;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(58, 86, 212, 0.15);
-        }
-
-        .server-selector-header {
-            background: linear-gradient(135deg, #3a56d4, #2a46c4);
-            color: white;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .server-selector-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.1rem;
-        }
-
-        .server-selector-header .toggle-icon {
-            font-size: 1.2rem;
-            transition: transform 0.3s;
-        }
-
-        .server-selector-header.collapsed .toggle-icon {
-            transform: rotate(-90deg);
-        }
-
-        .server-selector-content {
-            padding: 20px;
-            background: #f8fafc;
-            transition: all 0.3s;
-        }
-
-        .server-selector-content.collapsed {
-            display: none;
-        }
-
-        .server-stats-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-            background: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .server-stat-badge {
-            background: #3a56d4;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .server-stat-badge.good {
-            background: #10b981;
-        }
-
-        .server-stat-badge.bad {
-            background: #ef4444;
-        }
-
-        .server-stat-badge.warning {
-            background: #f59e0b;
-        }
-
-        .server-search-box {
-            flex: 1;
-            min-width: 250px;
-            display: flex;
-            gap: 8px;
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 30px;
-            padding: 4px 4px 4px 16px;
-        }
-
-        .server-search-box input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 6px 0;
-            font-size: 0.9rem;
-            background: transparent;
-        }
-
-        .server-search-box button {
-            background: #3a56d4;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 6px 16px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        .server-filter-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            background: white;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .server-filter-tab {
-            padding: 6px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 30px;
-            background: white;
-            color: #1e293b;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-
-        .server-filter-tab:hover {
-            background: #f1f5f9;
-        }
-
-        .server-filter-tab.active {
-            background: #3a56d4;
-            color: white;
-            border-color: #3a56d4;
-        }
-
-        .server-filter-tab .count {
-            background: #e2e8f0;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            color: #1e293b;
-        }
-
-        .server-filter-tab.active .count {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .servers-grid-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 8px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 12px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
-        }
-
-        .server-selector-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 30px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .server-selector-item:hover {
-            background: #e6edf8;
-            border-color: #3a56d4;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .server-selector-item.selected {
-            background: #3a56d4;
-            border-color: #3a56d4;
-            color: white;
-        }
-
-        .server-selector-item .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .server-selector-item .status-dot.good {
-            background: #10b981;
-            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-        }
-
-        .server-selector-item .status-dot.bad {
-            background: #ef4444;
-            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-        }
-
-        .server-selector-item .status-dot.warning {
-            background: #f59e0b;
-            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
-        }
-
-        .server-selector-item.selected .status-dot {
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
-        }
-
-        .server-selector-item .server-name {
-            flex: 1;
-            font-family: monospace;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .selected-server-info {
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-        }
-
-        .selected-server-header {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            padding: 15px 20px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .selected-server-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1e293b;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .selected-server-status-badge {
-            padding: 6px 16px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .selected-server-status-badge.good {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .selected-server-status-badge.bad {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .selected-server-status-badge.warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .server-timeline {
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .server-timeline-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 4px solid;
-        }
-
-        .timeline-time {
-            min-width: 140px;
-            color: #64748b;
-            font-size: 0.85rem;
-        }
-
-        .timeline-stats {
-            flex: 1;
-            display: flex;
-            gap: 20px;
-        }
-
-        .timeline-target, .timeline-sent {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .timeline-label {
-            font-size: 0.65rem;
-            color: #64748b;
-            text-transform: uppercase;
-        }
-
-        .timeline-value {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .timeline-percentage {
-            min-width: 70px;
-            text-align: right;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .blocks-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .data-block {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-        }
-
-        .block-header {
-            background: #f8fafc;
-            padding: 12px 20px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .time-badge {
-            background: #3b82f6;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-        }
-
-        .ip-badge {
-            background: #f59e0b;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .domain-badge {
-            background: #10b981;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .servers-grid {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-        }
-
-        .server-card {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 4px solid;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .server-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        }
-
-        .server-card.excellent {
-            border-left-color: #10b981;
-        }
-
-        .server-card.good {
-            border-left-color: #3b82f6;
-        }
-
-        .server-card.warning {
-            border-left-color: #f59e0b;
-        }
-
-        .server-card.bad {
-            border-left-color: #ef4444;
-        }
-
-        .server-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .server-name {
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 14px;
-        }
-
-        .server-status {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 20px;
-        }
-
-        .server-status.excellent {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .server-status.good {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .server-status.warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .server-status.bad {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            background: white;
-            padding: 8px 10px;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            margin: 10px 0;
-        }
-
-        .target-box .label, .sent-box .label {
-            color: #64748b;
-            font-size: 9px;
-            text-transform: uppercase;
-        }
-
-        .target-box .value {
-            font-weight: 700;
-            font-size: 14px;
-            color: #1e293b;
-        }
-
-        .sent-box .value {
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .sent-box .value.excellent {
-            color: #10b981;
-        }
-
-        .sent-box .value.good {
-            color: #3b82f6;
-        }
-
-        .sent-box .value.warning {
-            color: #f59e0b;
-        }
-
-        .sent-box .value.bad {
-            color: #ef4444;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-        }
-
-        .progress-fill.excellent {
-            background: #10b981;
-        }
-
-        .progress-fill.good {
-            background: #3b82f6;
-        }
-
-        .progress-fill.warning {
-            background: #f59e0b;
-        }
-
-        .progress-fill.bad {
-            background: #ef4444;
-        }
-
-        .percentage {
-            font-size: 11px;
-            color: #64748b;
-            text-align: right;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            background: white;
-            border-radius: 12px;
-            color: #64748b;
-            border: 1px solid #e2e8f0;
-        }
-
-        .toast-message {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #3a56d4;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 1.7s;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        .copied {
-            background: #28a745 !important;
-        }
-        
-        .btn.success {
-            background: #28a745 !important;
-            color: white !important;
-            border-color: #28a745 !important;
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Server Tools</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#f0f2f7;--surface:#fff;--surface2:#f7f8fc;--border:#e4e7f0;
+  --text:#111827;--text2:#6b7280;--text3:#94a3b8;
+  --accent:#4f6ef7;--accent-dim:#eef0fe;
+  --green:#059669;--green-dim:#d1fae5;
+  --red:#ef4444;--red-dim:#fee2e2;
+  --orange:#d97706;--orange-dim:#fef3c7;
+  --gray-dim:#f1f5f9;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
+  --shadow:0 2px 8px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.12);
+  --r:14px;--rs:8px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:50;}
+.topbar-brand{display:flex;align-items:center;gap:9px;font-size:1.05rem;font-weight:700;color:var(--text);}
+.brand-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.srv-btn{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);padding:7px 14px;font-family:'Outfit',sans-serif;font-weight:600;font-size:0.8rem;color:var(--text2);cursor:pointer;transition:all .15s;}
+.srv-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.srv-badge{background:var(--accent);color:#fff;border-radius:10px;padding:1px 7px;font-size:0.65rem;font-weight:700;}
+
+/* ── TABS ── */
+.tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;gap:0;}
+.tab-btn{padding:14px 22px;font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.tab-btn:hover{color:var(--accent);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-icon{font-size:0.95rem;}
+
+/* ── PANELS ── */
+.panel{display:none;}.panel.active{display:block;}
+.main{padding:24px 28px 48px;max-width:1200px;margin:0 auto;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow-sm);}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.card-title{font-size:0.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:720px){.two-col{grid-template-columns:1fr;}}
+
+/* ── BUTTONS ── */
+button.primary{background:var(--accent);color:#fff;border:none;border-radius:var(--rs);font-family:'Outfit',sans-serif;font-weight:600;font-size:0.85rem;padding:10px 22px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+button.primary:hover{background:#3b58e0;transform:translateY(-1px);}
+button.secondary{background:transparent;color:var(--text2);border:1.5px solid var(--border);border-radius:var(--rs);font-family:'Outfit',sans-serif;font-weight:600;font-size:0.8rem;padding:8px 14px;cursor:pointer;transition:all .15s;}
+button.secondary:hover{border-color:var(--red);color:var(--red);background:#fff5f5;}
+button.success{background:var(--green);color:#fff;border:none;border-radius:var(--rs);font-family:'Outfit',sans-serif;font-weight:600;font-size:0.87rem;padding:11px 22px;cursor:pointer;transition:all .15s;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;}
+button.success:hover{background:#047857;transform:translateY(-1px);}
+button.success:disabled{background:var(--border);color:var(--text2);cursor:not-allowed;transform:none;}
+button.ghost{background:transparent;border:1.5px solid var(--border);color:var(--text2);border-radius:var(--rs);font-family:'Outfit',sans-serif;font-weight:600;font-size:0.76rem;padding:7px 13px;cursor:pointer;transition:all .15s;}
+button.ghost:hover{border-color:var(--accent);color:var(--accent);}
+button.ghost.danger:hover{border-color:var(--red);color:var(--red);background:#fff5f5;}
+
+/* ── INPUTS ── */
+textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.74rem;padding:12px;resize:vertical;outline:none;line-height:1.9;transition:border-color .15s;}
+textarea:focus{border-color:var(--accent);}
+textarea::placeholder{color:#c4c9d8;}
+input[type=date]{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'Outfit',sans-serif;font-size:0.8rem;padding:8px 12px;outline:none;transition:border-color .15s;}
+input[type=date]:focus{border-color:var(--accent);}
+
+/* ── SORTER specific ── */
+.input-footer{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.stats-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.stat-chip{background:var(--accent-dim);border:1px solid #dce3fc;border-radius:20px;padding:5px 12px;font-size:0.71rem;font-weight:500;color:var(--accent);}
+.stat-chip span{color:#94a3b8;margin-right:4px;}
+.stat-chip.spam{background:var(--orange-dim);border-color:#fde68a;color:var(--orange);}
+.stat-chip.spam span{color:#fbbf24;}
+.pills-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+.pill{display:flex;align-items:center;gap:5px;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:4px 12px;font-family:'JetBrains Mono',monospace;font-size:0.67rem;cursor:pointer;transition:all .15s;color:var(--text2);font-weight:500;}
+.pill.filled{background:var(--accent-dim);border-color:#c7d3fb;color:var(--accent);}
+.pill.filled:hover{background:#dce5fd;border-color:var(--accent);}
+.pill.active{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important;box-shadow:0 2px 8px rgba(79,110,247,.3);}
+.pill.spam-pill{background:var(--orange-dim);border-color:#fde68a;color:var(--orange);}
+.pill.spam-pill.active{background:var(--orange)!important;border-color:var(--orange)!important;color:#fff!important;}
+.pill .cnt{background:rgba(0,0,0,.1);border-radius:10px;padding:1px 5px;font-size:0.58rem;font-weight:700;}
+.pill.active .cnt{background:rgba(255,255,255,.25);}
+.preview-wrap{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);height:280px;overflow-y:auto;padding:12px;}
+.preview-wrap::-webkit-scrollbar{width:4px;}
+.preview-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.no-data{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text2);font-size:0.76rem;}
+.no-data .ico{font-size:2rem;opacity:.3;}
+.pvw-title{font-size:0.7rem;font-weight:600;color:var(--orange);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.pvw-title.k{color:var(--accent);}
+.hint-text{font-size:0.72rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:10px;line-height:1.6;}
+.hint-text strong{color:var(--accent);}
+
+/* preview table */
+.pvw-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.71rem;}
+.pvw-table th{text-align:left;padding:4px 8px;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--border);font-family:'Outfit',sans-serif;font-weight:600;}
+.pvw-table td{padding:4px 8px;color:#4b5563;border-bottom:1px solid var(--border);}
+.pvw-table tr:last-child td{border-bottom:none;}
+.pvw-table tr:hover td{background:#f0f4ff;}
+.v-green{color:var(--green)!important;font-weight:600;}
+.v-srv{color:var(--text);font-weight:500;}
+.v-spam{color:var(--orange)!important;}
+.spam-chip{background:var(--orange-dim);color:var(--orange);border-radius:4px;padding:1px 6px;font-size:0.6rem;font-weight:700;}
+
+/* ── PROGRESS specific ── */
+.summary-bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.sum-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:2px;}
+.sum-chip-val{font-size:1.2rem;font-weight:700;color:var(--text);}
+.sum-chip-label{font-size:0.67rem;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
+.sum-chip.up .sum-chip-val{color:var(--green);}
+.sum-chip.dn .sum-chip-val{color:var(--red);}
+.sum-chip.warn .sum-chip-val{color:var(--orange);}
+
+/* filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.filter-label{font-size:0.72rem;font-weight:600;color:var(--text2);margin-right:2px;}
+.filter-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:4px 12px;font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* picker panel */
+.picker-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);margin-bottom:16px;overflow:hidden;}
+.picker-header{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;cursor:pointer;user-select:none;transition:background .15s;}
+.picker-header:hover{background:var(--surface2);}
+.picker-header-left{display:flex;align-items:center;gap:12px;}
+.picker-title{font-size:0.72rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text2);}
+.picker-meta{background:var(--accent-dim);color:var(--accent);border-radius:20px;padding:2px 10px;font-size:0.68rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.picker-meta.has-sel{background:var(--accent);color:#fff;}
+.picker-chevron{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--text3);transition:transform .25s,background .15s;}
+.picker-chevron.open{transform:rotate(180deg);}
+.picker-header:hover .picker-chevron{background:var(--border);}
+.picker-body{border-top:1px solid var(--border);padding:16px 20px;display:none;}
+.picker-body.open{display:block;}
+.picker-top-row{display:flex;gap:10px;align-items:center;margin-bottom:12px;}
+.picker-search{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.73rem;padding:7px 12px;outline:none;transition:border-color .15s;}
+.picker-search:focus{border-color:var(--accent);}
+.picker-search::placeholder{color:var(--text3);}
+.picker-actions-row{display:flex;gap:6px;}
+.picker-action{background:transparent;border:1.5px solid var(--border);border-radius:var(--rs);padding:5px 12px;font-family:'Outfit',sans-serif;font-size:0.71rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.picker-action:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.picker-action.danger:hover{border-color:var(--red);color:var(--red);background:var(--red-dim);}
+.picker-grid{display:flex;flex-wrap:wrap;gap:6px;max-height:220px;overflow-y:auto;padding-right:4px;}
+.picker-grid::-webkit-scrollbar{width:4px;}
+.picker-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.srv-chip-sel{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:0.69rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;}
+.srv-chip-sel:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.srv-chip-sel.selected{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(79,110,247,.2);}
+.chip-trend{font-size:0.6rem;opacity:.8;}
+
+/* progress table */
+.table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);overflow:hidden;}
+.table-scroll{overflow-x:auto;}
+.table-scroll::-webkit-scrollbar{height:5px;}
+.table-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.prog-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+.prog-table thead tr{background:var(--surface2);border-bottom:2px solid var(--border);}
+.prog-table th{padding:10px 14px;text-align:left;font-size:0.65rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text2);white-space:nowrap;font-family:'Outfit',sans-serif;}
+.prog-table th.sticky-col{position:sticky;left:0;background:var(--surface2);z-index:10;border-right:1px solid var(--border);}
+.prog-table th.date-col{text-align:center;}
+.prog-table tbody tr{border-bottom:1px solid var(--border);transition:background .1s;}
+.prog-table tbody tr:last-child{border-bottom:none;}
+.prog-table tbody tr:hover{background:#f8faff;}
+.prog-table td{padding:8px 14px;vertical-align:middle;white-space:nowrap;}
+.prog-table td.sticky-col{position:sticky;left:0;background:var(--surface);z-index:5;border-right:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:500;color:var(--text);}
+.prog-table tbody tr:hover td.sticky-col{background:#f8faff;}
+.level-cell{display:flex;align-items:center;justify-content:center;gap:4px;}
+.level-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;font-weight:600;min-width:44px;text-align:center;}
+.lv-35k{background:#fce7f3;color:#be185d;}
+.lv-30k{background:#ede9fe;color:#6d28d9;}
+.lv-24k{background:#dbeafe;color:#1d4ed8;}
+.lv-20k{background:#d1fae5;color:#065f46;}
+.lv-16k{background:#dcfce7;color:#166534;}
+.lv-12k{background:#fef9c3;color:#854d0e;}
+.lv-8k{background:#ffedd5;color:#9a3412;}
+.lv-4k{background:#fee2e2;color:#991b1b;}
+.lv-3k{background:#fef3c7;color:#92400e;}
+.lv-2k{background:#fefce8;color:#a16207;}
+.lv-1k{background:#f1f5f9;color:#475569;}
+.lv-05k{background:#f8fafc;color:#64748b;}
+.lv-025k{background:#f8fafc;color:#94a3b8;}
+.lv-spam{background:#fef2f2;color:#dc2626;font-style:italic;}
+.lv-empty{color:var(--text3);font-size:0.65rem;text-align:center;}
+.trend{font-size:0.65rem;font-weight:700;}
+.trend.up{color:var(--green);}
+.trend.dn{color:var(--red);}
+.trend.same{color:var(--text3);}
+.prog-table td.trend-col{text-align:center;}
+.trend-summary{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:0.68rem;font-weight:600;}
+.trend-summary.up{background:var(--green-dim);color:var(--green);}
+.trend-summary.dn{background:var(--red-dim);color:var(--red);}
+.trend-summary.same{background:var(--gray-dim);color:var(--text2);}
+.trend-summary.mixed{background:var(--orange-dim);color:var(--orange);}
+
+/* empty */
+.empty-state{padding:60px 20px;text-align:center;color:var(--text3);}
+.empty-state .ico{font-size:2.5rem;margin-bottom:12px;opacity:.4;}
+.empty-state p{font-size:0.85rem;}
+
+/* ── DRAWER ── */
+.overlay{position:fixed;inset:0;background:rgba(17,24,39,.35);backdrop-filter:blur(3px);z-index:100;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:380px;max-width:95vw;background:var(--surface);z-index:101;box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--border);}
+.drawer.open{transform:translateX(0);}
+.drawer-header{padding:22px 24px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.drawer-title{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.drawer-count{background:var(--accent-dim);color:var(--accent);border-radius:20px;padding:2px 9px;font-size:0.72rem;font-weight:600;}
+.close-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;color:var(--text2);transition:all .15s;}
+.close-btn:hover{background:#fee2e2;border-color:var(--red);color:var(--red);}
+.drawer-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px;}
+.drawer-body::-webkit-scrollbar{width:4px;}
+.drawer-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.drawer-section-label{font-size:0.65rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;}
+.add-row{display:flex;gap:8px;}
+.add-row input{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:0.76rem;padding:9px 12px;outline:none;transition:border-color .15s;}
+.add-row input:focus{border-color:var(--accent);}
+.add-row input::placeholder{color:#c4c9d8;}
+.btn-icon-add{background:var(--accent);color:#fff;border:none;border-radius:var(--rs);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.2rem;transition:all .15s;flex-shrink:0;}
+.btn-icon-add:hover{background:#3b58e0;transform:scale(1.05);}
+.bulk-wrap{display:flex;flex-direction:column;gap:8px;}
+.bulk-wrap textarea{height:90px;line-height:1.7;}
+.bulk-actions{display:flex;gap:7px;}
+.srv-list{display:flex;flex-direction:column;gap:5px;}
+.srv-item{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:8px 12px;transition:border-color .15s;animation:slideIn .2s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+.srv-item:hover{border-color:#c7d0e8;}
+.srv-name{flex:1;font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--text);}
+.srv-edit-input{flex:1;background:transparent;border:none;border-bottom:1.5px solid var(--accent);outline:none;font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--text);padding:0 2px;}
+.ibt{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:6px;font-size:0.85rem;transition:background .15s;}
+.ibt:hover{background:var(--border);}
+.ibt.del:hover{background:#fee2e2;}
+.empty-srv{text-align:center;color:var(--text2);font-size:0.75rem;padding:24px 0;font-family:'JetBrains Mono',monospace;}
+.drawer-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:8px;}
+
+/* ── PERFORMANCE TAB ─────────────────────────────────────────────────────── */
+.perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px;}
+.perf-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
+.perf-block-head{background:var(--surface2);padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.perf-time{background:var(--accent);color:#fff;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.perf-byip{background:var(--orange-dim);color:var(--orange);border:1px solid #fde68a;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.perf-team{background:var(--accent-dim);color:var(--accent);border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;}
+.perf-profile{color:var(--text3);font-size:0.68rem;font-family:'JetBrains Mono',monospace;margin-left:auto;}
+.perf-servers{padding:10px 12px;display:flex;flex-direction:column;gap:5px;}
+.perf-server-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;transition:all .15s;}
+.perf-server-row:hover{border-color:var(--accent);background:var(--accent-dim);}
+.perf-server-row.perf-down{background:#fff5f5;border-color:#fca5a5;}
+.perf-sname{font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:500;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.perf-target{font-size:0.68rem;color:var(--text3);font-family:'JetBrains Mono',monospace;text-align:right;}
+.perf-sent{font-size:0.72rem;font-weight:600;font-family:'JetBrains Mono',monospace;text-align:right;min-width:52px;}
+.perf-pct{font-size:0.68rem;font-weight:600;border-radius:10px;padding:2px 7px;min-width:44px;text-align:center;}
+.perf-pct.exc{background:#d1fae5;color:#065f46;}
+.perf-pct.good{background:#dbeafe;color:#1e40af;}
+.perf-pct.warn{background:#fef3c7;color:#92400e;}
+.perf-pct.bad{background:#fee2e2;color:#991b1b;}
+.perf-pct.down{background:#fef2f2;color:#dc2626;}
+.perf-bar{height:3px;background:var(--border);border-radius:2px;margin:0 8px 6px;overflow:hidden;}
+.perf-bar-fill{height:100%;border-radius:2px;transition:width .4s;}
+.perf-bar-fill.exc{background:var(--green);}
+.perf-bar-fill.good{background:var(--accent);}
+.perf-bar-fill.warn{background:var(--orange);}
+.perf-bar-fill.bad{background:var(--red);}
+
+/* timeline side-panel */
+.perf-layout{display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;}
+@media(max-width:900px){.perf-layout{grid-template-columns:1fr;}}
+.perf-timeline-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-sm);position:sticky;top:80px;}
+.perf-tl-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.perf-tl-title{font-size:0.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);}
+.perf-tl-name{font-family:'JetBrains Mono',monospace;font-size:0.85rem;font-weight:700;color:var(--accent);}
+.perf-tl-body{padding:10px;max-height:500px;overflow-y:auto;}
+.perf-tl-body::-webkit-scrollbar{width:4px;}
+.perf-tl-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.perf-tl-item{border-left:3px solid;border-radius:0 8px 8px 0;padding:8px 12px;margin-bottom:7px;background:var(--surface2);}
+.perf-tl-time{font-size:0.67rem;color:var(--text3);font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.perf-tl-stats{display:flex;gap:14px;align-items:center;}
+.perf-tl-val{display:flex;flex-direction:column;}
+.perf-tl-lbl{font-size:0.58rem;text-transform:uppercase;color:var(--text3);letter-spacing:.8px;}
+.perf-tl-num{font-size:0.82rem;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+/* perf filters */
+.perf-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.perf-filter-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:4px 13px;font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;}
+.perf-filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.perf-filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.perf-copy-btn{background:transparent;border:1.5px solid var(--border);border-radius:var(--rs);padding:4px 11px;font-family:'Outfit',sans-serif;font-size:0.72rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;margin-left:auto;}
+.perf-copy-btn:hover{border-color:var(--green);color:var(--green);}
+
+/* perf summary chips */
+.perf-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.perf-sum-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 15px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:2px;}
+.perf-sum-val{font-size:1.1rem;font-weight:700;color:var(--text);}
+.perf-sum-label{font-size:0.64rem;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
+.perf-sum-chip.g .perf-sum-val{color:var(--green);}
+.perf-sum-chip.w .perf-sum-val{color:var(--orange);}
+.perf-sum-chip.b .perf-sum-val{color:var(--red);}
+
+
+/* ══ PERFORMANCE TAB ══════════════════════════════════════════════════════ */
+/* ── Selector Panel ── */
+.sel-panel{background:var(--surface);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid var(--border);}
+.sel-header{background:linear-gradient(135deg,#3a50d4 0%,#4f6ef7 100%);color:#fff;padding:13px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.sel-header-left{display:flex;align-items:center;gap:12px;}
+.sel-header-title{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;}
+.sel-count-badge{background:rgba(255,255,255,.2);border-radius:20px;padding:3px 11px;font-size:0.75rem;font-weight:600;}
+.sel-chevron{font-size:.9rem;transition:transform .25s;color:#fff;}
+.sel-chevron.open{transform:rotate(180deg);}
+.sel-body{display:none;background:#f8fafc;padding:16px 20px;}
+.sel-body.open{display:block;}
+
+/* stats + search row */
+.sel-top-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.sel-stat-pill{display:flex;align-items:center;gap:7px;border-radius:22px;padding:7px 16px;font-size:0.82rem;font-weight:700;color:#fff;cursor:default;}
+.sel-stat-pill.g{background:#10b981;}.sel-stat-pill.w{background:#f59e0b;}.sel-stat-pill.b{background:#ef4444;}
+.sel-stat-pill .dot-sm{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.5);}
+.sel-search-wrap{flex:1;min-width:200px;display:flex;background:#fff;border:1.5px solid var(--border);border-radius:28px;padding:4px 4px 4px 16px;gap:0;margin-left:auto;}
+.sel-search-wrap input{flex:1;border:none;outline:none;font-size:0.84rem;background:transparent;color:var(--text);}
+.sel-search-wrap input::placeholder{color:var(--text3);}
+.sel-search-btn{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:7px 18px;font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;}
+
+/* filter tabs */
+.sel-ftabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;background:#fff;padding:10px 14px;border-radius:10px;border:1px solid var(--border);}
+.sel-ftab{display:flex;align-items:center;gap:7px;padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:0.82rem;font-weight:600;cursor:pointer;background:#fff;color:var(--text);transition:all .15s;}
+.sel-ftab:hover{background:#f1f5f9;}
+.sel-ftab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.sel-ftab .fcnt{background:rgba(0,0,0,.08);border-radius:10px;padding:2px 8px;font-size:0.7rem;font-weight:700;}
+.sel-ftab.active .fcnt{background:rgba(255,255,255,.25);}
+
+/* servers grid */
+.sel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:6px;max-height:260px;overflow-y:auto;background:#fff;border-radius:10px;border:1px solid var(--border);padding:12px;margin-bottom:14px;}
+.sel-grid::-webkit-scrollbar{width:4px;}.sel-grid::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.sel-item{display:flex;align-items:center;gap:7px;border:1.5px solid var(--border);border-radius:22px;padding:6px 12px;cursor:pointer;transition:all .15s;background:#f8fafc;}
+.sel-item:hover{background:#edf2ff;border-color:var(--accent);transform:translateY(-1px);}
+.sel-item.sel{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sel-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.sel-dot.g{background:#10b981;}.sel-dot.w{background:#f59e0b;}.sel-dot.b{background:#ef4444;}
+.sel-item.sel .sel-dot{background:rgba(255,255,255,.7);}
+.sel-sname{flex:1;font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sel-occ{font-size:0.65rem;background:#e2e8f0;border-radius:10px;padding:2px 6px;color:var(--text2);font-weight:600;}
+.sel-item.sel .sel-occ{background:rgba(255,255,255,.2);color:#fff;}
+
+/* timeline */
+.sel-tl{background:#fff;border-radius:10px;border:1px solid var(--border);overflow:hidden;}
+.sel-tl-head{background:#f8fafc;padding:13px 18px;border-bottom:2px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.sel-tl-name{font-size:1rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;}
+.sel-tl-badge{padding:5px 14px;border-radius:20px;font-size:0.78rem;font-weight:700;}
+.sel-tl-badge.g{background:#d1fae5;color:#065f46;}.sel-tl-badge.w{background:#fef3c7;color:#92400e;}.sel-tl-badge.b{background:#fee2e2;color:#991b1b;}
+.sel-tl-rows{max-height:300px;overflow-y:auto;padding:10px;}
+.sel-tl-rows::-webkit-scrollbar{width:4px;}.sel-tl-rows::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.sel-tl-row{display:flex;align-items:center;gap:14px;padding:10px 12px;background:#f8fafc;border-radius:8px;border-left:4px solid;margin-bottom:6px;}
+.sel-tl-time{min-width:130px;color:var(--text2);font-size:0.81rem;display:flex;align-items:center;gap:5px;}
+.sel-tl-vals{flex:1;display:flex;gap:22px;}
+.sel-tl-val{display:flex;flex-direction:column;gap:1px;}
+.sel-tl-lbl{font-size:0.58rem;text-transform:uppercase;color:var(--text3);letter-spacing:.8px;}
+.sel-tl-num{font-weight:700;font-size:0.88rem;font-family:'JetBrains Mono',monospace;}
+.sel-tl-pct{font-weight:700;font-size:0.85rem;min-width:52px;text-align:right;}
+
+/* ── Filter bar ── */
+.pf-filterbar{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:var(--shadow-sm);}
+.pf-group{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.pf-glabel{font-size:0.75rem;font-weight:700;color:var(--text2);white-space:nowrap;}
+.pf-sbtn{padding:5px 13px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s;}
+.pf-sbtn:hover{background:#f1f5f9;}.pf-sbtn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.pf-ipbtn{padding:5px 12px;border:1.5px solid #f59e0b;border-radius:20px;background:#fffbeb;color:#b45309;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all .15s;}
+.pf-ipbtn:hover{background:#fef3c7;}.pf-ipbtn.active{background:#f59e0b;color:#fff;border-color:#f59e0b;}
+.pf-copy-all{margin-left:auto;display:flex;align-items:center;gap:6px;padding:7px 15px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:0.78rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s;}
+.pf-copy-all:hover{border-color:var(--green);color:var(--green);}
+
+/* ── Blocks ── */
+.pf-blocks{display:flex;flex-direction:column;gap:22px;}
+.pf-block{background:#fff;border-radius:var(--r);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);}
+.pf-block-head{background:#f8fafc;padding:12px 20px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.pf-btime{background:#3b82f6;color:#fff;border-radius:20px;padding:5px 13px;font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:5px;}
+.pf-bip{background:#f59e0b;color:#fff;border-radius:20px;padding:5px 13px;font-size:0.75rem;font-weight:700;}
+.pf-bnodomain{color:var(--text3);font-style:italic;font-size:0.8rem;}
+.pf-bcopy{margin-left:auto;display:flex;align-items:center;gap:5px;padding:5px 13px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s;}
+.pf-bcopy:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── Server cards ── */
+.pf-cards{padding:18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
+.pf-card{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;border-left:4px solid transparent;cursor:pointer;transition:all .15s;}
+.pf-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08);}
+.pf-card.cl-good{border-left-color:#3b82f6;}.pf-card.cl-exc{border-left-color:#10b981;}
+.pf-card.cl-warn{border-left-color:#f59e0b;}.pf-card.cl-bad{border-left-color:#ef4444;}
+.pf-card.cl-down{border-left-color:#ef4444;background:#fff5f5;}
+.pf-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.pf-cname{font-weight:600;font-size:0.84rem;color:var(--text);display:flex;align-items:center;gap:6px;}
+.pf-cstatus{font-size:0.67rem;font-weight:700;padding:3px 9px;border-radius:12px;}
+.pf-cstatus.cl-good{background:#dbeafe;color:#1e40af;}.pf-cstatus.cl-exc{background:#d1fae5;color:#065f46;}
+.pf-cstatus.cl-warn{background:#fef3c7;color:#92400e;}.pf-cstatus.cl-bad{background:#fee2e2;color:#991b1b;}
+.pf-cstatus.cl-down{background:#fee2e2;color:#991b1b;}
+.pf-cstats{display:flex;justify-content:space-between;background:#fff;padding:8px 11px;border-radius:7px;border:1px solid var(--border);margin:8px 0;}
+.pf-cstat{display:flex;flex-direction:column;gap:2px;}
+.pf-cslbl{font-size:0.6rem;text-transform:uppercase;color:var(--text3);letter-spacing:.6px;}
+.pf-csval{font-weight:700;font-size:0.94rem;}
+.pf-csval.cl-good{color:#3b82f6;}.pf-csval.cl-exc{color:#10b981;}
+.pf-csval.cl-warn{color:#f59e0b;}.pf-csval.cl-bad{color:#ef4444;}
+.pf-cpbar{height:5px;background:var(--border);border-radius:3px;margin:6px 0;overflow:hidden;}
+.pf-cpfill{height:100%;border-radius:3px;}
+.pf-cpfill.cl-good{background:#3b82f6;}.pf-cpfill.cl-exc{background:#10b981;}
+.pf-cpfill.cl-warn{background:#f59e0b;}.pf-cpfill.cl-bad{background:#ef4444;}
+.pf-cpct{font-size:0.72rem;color:var(--text3);text-align:right;}
+</style>
 </head>
 <body>
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-        <div class="header-content">
-            <div class="header-left">
-                <h1>Server Tools Dashboard</h1>
-                <p class="subtitle">Server Performance · Domain/IP Explorer · Email Error Parser</p>
-            </div>
-            <div class="tool-selector">
-                <button class="tool-tab active" onclick="switchTab(0)">📊 Server Performance</button>
-                <button class="tool-tab" onclick="switchTab(1)">🌐 Domain/IP Explorer</button>
-                <button class="tool-tab" onclick="switchTab(2)">📧 Email Error Parser</button>
-            </div>
-        </div>
+
+<!-- OVERLAY + DRAWER -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div class="drawer-title">🖥 Server List <span class="drawer-count" id="drawerCount">0</span></div>
+    <div class="close-btn" onclick="closeDrawer()">✕</div>
+  </div>
+  <div class="drawer-body">
+    <div>
+      <div class="drawer-section-label">Add server</div>
+      <div class="add-row">
+        <input type="text" id="newSrv" placeholder="server_name"/>
+        <button class="btn-icon-add" onclick="addOne()">+</button>
+      </div>
     </div>
-
-    <!-- Main Container -->
-    <div class="dashboard-container">
-        <!-- Tab 0: Server Performance Analyzer -->
-        <div id="tab0" class="tool-section active">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-chart-line"></i> Server Performance Analyzer</h2>
-                </div>
-                
-                <textarea id="inputData" placeholder="Paste your server performance data here..."></textarea>
-                
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="parseData()"><i class="fas fa-play"></i> Parse Data</button>
-                    <button class="btn btn-outline" onclick="resetFilters()"><i class="fas fa-undo"></i> Reset Filters</button>
-                    <button class="btn btn-danger" onclick="resetServerPerformance()"><i class="fas fa-trash"></i> Clear All</button>
-                </div>
-            </div>
-
-            <!-- Server Selector Section -->
-            <div id="serverSelectorSection" class="server-selector-section" style="display: none;">
-                <div class="server-selector-header" onclick="toggleServerSelector()">
-                    <h3>
-                        <i class="fas fa-server"></i>
-                        Server Selector
-                        <span id="totalServersBadge" class="badge" style="background: rgba(255,255,255,0.2);">0 servers</span>
-                    </h3>
-                    <i class="fas fa-chevron-down toggle-icon" id="selectorToggleIcon"></i>
-                </div>
-                <div class="server-selector-content collapsed" id="serverSelectorContent">
-                    <div class="server-stats-bar">
-                        <div class="server-stat-badge good">
-                            <i class="fas fa-check-circle"></i>
-                            <span id="goodServersCount">0 Good</span>
-                        </div>
-                        <div class="server-stat-badge warning">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span id="warningServersCount">0 Warning</span>
-                        </div>
-                        <div class="server-stat-badge bad">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <span id="badServersCount">0 Bad</span>
-                        </div>
-                        <div class="server-search-box">
-                            <input type="text" id="serverSearchInput" placeholder="Search server name..." onkeyup="filterServers()">
-                            <button onclick="filterServers()"><i class="fas fa-search"></i> Search</button>
-                        </div>
-                    </div>
-
-                    <div class="server-filter-tabs">
-                        <button class="server-filter-tab active" onclick="filterServersByStatus('all')">
-                            <i class="fas fa-list"></i> All <span class="count" id="allServersCount">0</span>
-                        </button>
-                        <button class="server-filter-tab" onclick="filterServersByStatus('good')">
-                            <i class="fas fa-check-circle"></i> Good <span class="count" id="goodFilterCount">0</span>
-                        </button>
-                        <button class="server-filter-tab" onclick="filterServersByStatus('warning')">
-                            <i class="fas fa-exclamation-triangle"></i> Warning <span class="count" id="warningFilterCount">0</span>
-                        </button>
-                        <button class="server-filter-tab" onclick="filterServersByStatus('bad')">
-                            <i class="fas fa-exclamation-circle"></i> Bad <span class="count" id="badFilterCount">0</span>
-                        </button>
-                    </div>
-
-                    <div id="serversGrid" class="servers-grid-selector"></div>
-
-                    <div id="selectedServerInfo" class="selected-server-info" style="display: none;">
-                        <div class="selected-server-header">
-                            <div class="selected-server-name">
-                                <i class="fas fa-server"></i>
-                                <span id="selectedServerName">server_name</span>
-                            </div>
-                            <span id="selectedServerStatus" class="selected-server-status-badge">status</span>
-                        </div>
-                        <div id="serverTimeline" class="server-timeline"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="results" class="hidden">
-                <div class="filter-section" id="filterSection"></div>
-                <div id="blocksContainer" class="blocks-container"></div>
-            </div>
-        </div>
-
-        <!-- Tab 1: Domain/IP Explorer (updated) -->
-        <div id="tab1" class="tool-section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-globe"></i> Domain/IP Explorer</h2>
-                    <span class="badge" id="blockCount">0 blocks</span>
-                </div>
-                
-                <textarea id="rawInput" placeholder="Paste your message send bot logs…"></textarea>
-            </div>
-
-            <!-- Domain Filter Bar (NEW) -->
-            <div class="ip-index-bar" style="background: #e8f5e9; border-color: #10b981;">
-                <span class="card-title" style="margin:0; color: #047857;">
-                    <i class="fas fa-globe"></i> by Domain
-                </span>
-                <div class="ip-pills" id="domainPillsContainer"></div>
-                <div class="reset-pill" id="resetDomainSelection">show all domains</div>
-            </div>
-
-            <!-- IP Filter Bar (existing) -->
-            <div class="ip-index-bar">
-                <span class="card-title" style="margin:0;"><i class="fas fa-filter"></i> by IP value</span>
-                <div class="ip-pills" id="ipPillsContainer"></div>
-                <div class="reset-pill" id="resetSelection">show all IPs</div>
-            </div>
-
-            <div class="stats-line">
-                <span id="selectedFilterLabel">🌐 all groups</span> · <span id="serverCountDisplay">0 servers</span>
-                <div>
-                    <button class="btn btn-outline btn-sm" id="resetIPExplorerBtn" title="Reset everything to default">
-                        <i class="fas fa-trash"></i> full reset
-                    </button>
-                    <button class="btn btn-outline btn-sm" id="downloadTableBtn" title="Download filtered data as CSV">
-                        <i class="fas fa-download"></i> download CSV
-                    </button>
-                </div>
-            </div>
-
-            <div id="resultsContainer" class="masonry-grid">
-                <div class="placeholder-nodata">👆 paste data, then click any domain or IP pill</div>
-            </div>
-        </div>
-
-        <!-- Tab 2: Email Error Parser -->
-        <div id="tab2" class="tool-section">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-envelope"></i> Email Error Parser</h2>
-                    <p>Click on any error type to see its IPs</p>
-                </div>
-                
-                <textarea id="inputText" placeholder="Paste your error log here..."></textarea>
-                
-                <div class="button-group">
-                    <div class="left-buttons">
-                        <button class="btn btn-primary" onclick="parseErrors()">
-                            <i class="fas fa-play"></i> Parse Errors
-                        </button>
-                    </div>
-                    <div class="right-buttons">
-                        <button class="btn btn-danger" onclick="resetEmailParser()">
-                            <i class="fas fa-trash"></i> Reset Everything
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Summary Cards -->
-            <div id="summaryCards" class="summary-cards" style="display: none;"></div>
-
-            <!-- Detected Errors Section -->
-            <div id="errorSelector" class="error-type-selector" style="display: none;">
-                <div class="detected-errors-title">
-                    <h3><i class="fas fa-tags"></i> Detected Errors</h3>
-                    <span id="errorCount" class="error-count-badge">0 errors</span>
-                </div>
-                
-                <div id="errorTabs" class="error-type-tabs"></div>
-
-                <div id="errorContent" class="error-content" style="display: none;"></div>
-            </div>
-
-            <!-- Loading -->
-            <div id="loading" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Parsing error data...</p>
-            </div>
-        </div>
+    <div>
+      <div class="drawer-section-label">Bulk paste</div>
+      <div class="bulk-wrap">
+        <textarea id="bulkSrv" placeholder="Paste many servers, one per line…"></textarea>
+        <div class="bulk-actions"><button class="ghost" style="flex:1" onclick="bulkAdd()">+ Add All</button></div>
+      </div>
     </div>
+    <div>
+      <div class="drawer-section-label">Saved servers</div>
+      <div class="srv-list" id="srvList"></div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="ghost danger" style="flex:1" onclick="clearSrvs()">🗑 Clear All</button>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-brand"><div class="brand-dot"></div>Server Tools</div>
+  <div class="topbar-right">
+    <div class="srv-btn" onclick="openDrawer()">🖥 Manage Servers <span class="srv-badge" id="topBadge">0</span></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('sorter',this)"><span class="tab-icon">⚡</span>OUT Sorter</button>
+  <button class="tab-btn" onclick="switchTab('progress',this)"><span class="tab-icon">📈</span>Progress Analyser</button>
+  <button class="tab-btn" onclick="switchTab('perf',this)"><span class="tab-icon">📊</span>Server Performance</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ SORTER PANEL -->
+<div class="panel active" id="panel-sorter">
+<div class="main">
+  <div class="two-col">
+    <div class="card">
+      <div class="card-head"><div class="card-title">Input Data</div></div>
+      <div class="hint-text">Paste raw server data. Telegram messages & group headers are ignored automatically.</div>
+      <textarea id="inputArea" style="height:220px" placeholder="Paste data here…
+
+102950 (OUT)
+s_cmh6_5931  30002  8722
+s_cmh6_5935  30002  12652
+
+Ctrl+Enter to parse"></textarea>
+      <div class="input-footer">
+        <input type="date" id="dateInput"/>
+        <button class="primary" onclick="parseData()" style="flex:1">⚡ Parse &amp; Sort</button>
+        <button class="secondary" onclick="resetSorter()">↺</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Sorted Buckets</div></div>
+      <div class="stats-bar" id="statsBar" style="display:none"></div>
+      <div class="pills-wrap" id="pillsWrap"><span style="font-size:.75rem;color:var(--text2);font-family:'JetBrains Mono',monospace">Buckets appear after parsing…</span></div>
+      <div class="preview-wrap" id="previewBox">
+        <div class="no-data"><div class="ico">📊</div><div>Parse data to see results</div></div>
+      </div>
+      <div style="margin-top:12px">
+        <button class="success" id="dlBtn" onclick="dlExcel()" disabled>↓ Download Excel (.xlsx)</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ PROGRESS PANEL -->
+<div class="panel" id="panel-progress">
+<div class="main">
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-head"><div class="card-title">Paste Data</div></div>
+    <div class="hint-text">Paste your <strong>All Data</strong> export (tab-separated: Date, Server, Level, Level_Num). Multiple dates are supported.</div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
+      <textarea id="progInput" style="height:180px" placeholder="Date	Server	Level	Level_Num
+2/22/2026	sl_cmh6_18	24k	24000
+..."></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="primary" onclick="analyseProgress()">▶ Analyse</button>
+        <button class="secondary" onclick="resetProgress()">↺ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-bar" id="progSummary" style="display:none"></div>
+
+  <div class="filters" id="progFilters" style="display:none">
+    <span class="filter-label">Show:</span>
+    <button class="filter-btn active" onclick="setPFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setPFilter('improved',this)">📈 Improved</button>
+    <button class="filter-btn" onclick="setPFilter('declined',this)">📉 Declined</button>
+    <button class="filter-btn" onclick="setPFilter('spam',this)">🚫 Has Spam</button>
+    <button class="filter-btn" onclick="setPFilter('stable',this)">➡ Stable</button>
+  </div>
+
+  <div class="picker-panel" id="pickerPanel" style="display:none">
+    <div class="picker-header" onclick="togglePickerBody()">
+      <div class="picker-header-left">
+        <div class="picker-title">🖥 Server Selection</div>
+        <div class="picker-meta" id="pickerMeta">All servers shown</div>
+      </div>
+      <div class="picker-chevron open" id="pickerChevron">▼</div>
+    </div>
+    <div class="picker-body open" id="pickerBody">
+      <div class="picker-top-row">
+        <input class="picker-search" id="pickerSearch" placeholder="🔍 Search servers…" oninput="renderPickerChips()"/>
+        <div class="picker-actions-row">
+          <button class="picker-action" onclick="pickerSelectAll()">Select All</button>
+          <button class="picker-action danger" onclick="pickerClear()">Clear</button>
+        </div>
+      </div>
+      <div class="picker-grid" id="pickerGrid"></div>
+    </div>
+  </div>
+
+  <div class="table-card" id="progTable">
+    <div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Analyse</p></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════ SHARED
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── LocalStorage server list ──────────────────────────────────────────────────
+const LS='srvSorter_v2';
+function lsLoad(){try{return JSON.parse(localStorage.getItem(LS))||[];}catch{return[];}}
+function lsSave(l){localStorage.setItem(LS,JSON.stringify(l));}
+
+// ── Tabs ─────────────────────────────────────────────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Drawer ───────────────────────────────────────────────────────────────────
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
+
+function addOne(){const i=document.getElementById('newSrv'),n=i.value.trim();if(!n)return;const l=lsLoad();if(!l.includes(n)){l.push(n);lsSave(l);}i.value='';renderDrawer();}
+function bulkAdd(){const raw=document.getElementById('bulkSrv').value.trim();if(!raw)return;const l=lsLoad();raw.split('\n').map(x=>x.trim()).filter(Boolean).forEach(n=>{if(!l.includes(n))l.push(n);});lsSave(l);document.getElementById('bulkSrv').value='';renderDrawer();}
+function delSrv(n){lsSave(lsLoad().filter(s=>s!==n));renderDrawer();}
+function startEdit(n){
+  const el=document.querySelector(`.srv-item[data-n="${CSS.escape(n)}"]`);if(!el)return;
+  el.innerHTML=`<input class="srv-edit-input" id="ei_${esc(n)}" value="${esc(n)}"/>
+    <button class="ibt" onclick="saveEdit('${esc(n)}')">✓</button>
+    <button class="ibt" onclick="renderDrawer()">✕</button>`;
+  el.querySelector('.srv-edit-input').focus();
+}
+function saveEdit(old){const el=document.getElementById(`ei_${old}`);const nw=el?.value.trim();if(!nw)return;const l=lsLoad();const i=l.indexOf(old);if(i!==-1){l[i]=nw;lsSave(l);}renderDrawer();}
+function clearSrvs(){if(!confirm('Clear all saved servers?'))return;lsSave([]);renderDrawer();}
+function renderDrawer(){
+  const list=lsLoad(),count=list.length;
+  document.getElementById('drawerCount').textContent=count;
+  document.getElementById('topBadge').textContent=count;
+  const box=document.getElementById('srvList');
+  if(!count){box.innerHTML=`<div class="empty-srv">No servers saved yet</div>`;return;}
+  box.innerHTML=list.map(n=>`<div class="srv-item" data-n="${esc(n)}">
+    <span class="srv-name">${esc(n)}</span>
+    <button class="ibt" onclick="startEdit('${esc(n)}')">✏️</button>
+    <button class="ibt del" onclick="delSrv('${esc(n)}')">🗑</button>
+  </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════ SORTER
+const BUCKETS=[
+  {label:'0.25K',min:0,max:500},{label:'0.5K',min:500,max:1000},
+  {label:'1K',min:1000,max:2000},{label:'2K',min:2000,max:3000},
+  {label:'3K',min:3000,max:4000},{label:'4K',min:4000,max:8000},
+  {label:'8K',min:8000,max:12000},{label:'12K',min:12000,max:16000},
+  {label:'16K',min:16000,max:20000},{label:'20K',min:20000,max:24000},
+  {label:'24K',min:24000,max:28000},{label:'30K',min:28000,max:35000},
+  {label:'35K+',min:35000,max:Infinity},
+];
+const LABELS=BUCKETS.map(b=>b.label);
+const SPAM_I=LABELS.length;
+function nearest(val){for(let i=0;i<BUCKETS.length;i++){if(val>=BUCKETS[i].min&&val<BUCKETS[i].max)return i;}return BUCKETS.length-1;}
+function pNum(s){return parseInt(String(s).replace(/,/g,''),10);}
+
+let bData=[],allRows=[],activeB=0;
+
+function parseData(){
+  const raw=document.getElementById('inputArea').value.trim();if(!raw)return;
+  const saved=new Set(lsLoad()),found=new Set();
+  bData=LABELS.map(()=>[]);bData.push([]);allRows=[];
+  for(let line of raw.split('\n')){
+    line=line.trim();if(!line)continue;
+    const parts=line.split(/\s+/);
+    if(parts.length<3)continue;
+    if(/^\d+$/.test(parts[0]))continue;
+    if(parts[0].endsWith(',')||parts[0].startsWith('['))continue;
+    if(isNaN(parseInt(String(parts[2]).replace(/,/g,''),10)))continue;
+    const server=parts[0],inV=parts[1],outV=pNum(parts.slice(2).join(''));
+    if(isNaN(outV))continue;
+    found.add(server);
+    const bi=nearest(outV),label=LABELS[bi];
+    bData[bi].push({server,inV,outV,level:label});
+    allRows.push({server,inV,outV,level:label,lNum:BUCKETS[bi].max===Infinity?35000:BUCKETS[bi].min});
+  }
+  saved.forEach(s=>{
+    if(!found.has(s)){bData[SPAM_I].push({server:s,inV:'-',outV:0,level:'spam'});allRows.push({server:s,inV:'-',outV:0,level:'spam',lNum:0});}
+  });
+  bData.forEach(b=>b.sort((a,z)=>a.outV-z.outV));
+  allRows.sort((a,z)=>a.server.localeCompare(z.server));
+  activeB=bData.findIndex(b=>b.length>0);if(activeB===-1)activeB=0;
+  renderPills();renderSorterStats();renderPreview(activeB);
+  document.getElementById('dlBtn').disabled=false;
+}
+
+function renderSorterStats(){
+  const bar=document.getElementById('statsBar');
+  const total=bData.slice(0,SPAM_I).reduce((a,b)=>a+b.length,0);
+  const fill=bData.slice(0,SPAM_I).filter(b=>b.length>0).length;
+  const spam=bData[SPAM_I]?.length||0;
+  if(!total&&!spam){bar.style.display='none';return;}
+  bar.style.display='flex';
+  bar.innerHTML=`<div class="stat-chip"><span>servers</span>${total}</div>
+    <div class="stat-chip"><span>buckets</span>${fill}/${LABELS.length}</div>
+    ${spam?`<div class="stat-chip spam"><span>spam</span>${spam}</div>`:''}`;
+}
+
+function renderPills(){
+  const kp=LABELS.map((lbl,i)=>{const c=bData[i]?.length||0;const cls=[c>0?'filled':'',i===activeB?'active':''].join(' ');return`<div class="pill ${cls}" onclick="sel(${i})">${lbl}<span class="cnt">${c}</span></div>`;}).join('');
+  const sc=bData[SPAM_I]?.length||0;
+  const sp=sc>0?`<div class="pill spam-pill ${activeB===SPAM_I?'active':''}" onclick="sel(${SPAM_I})">SPAM<span class="cnt">${sc}</span></div>`:'';
+  document.getElementById('pillsWrap').innerHTML=kp+sp;
+}
+
+function sel(i){activeB=i;renderPills();renderPreview(i);}
+
+function renderPreview(i){
+  const box=document.getElementById('previewBox');
+  const rows=bData[i]||[],isS=i===SPAM_I,lbl=isS?'SPAM':LABELS[i];
+  if(!rows.length){box.innerHTML=`<div class="no-data"><div class="ico">🪣</div><div>No servers in ${lbl}</div></div>`;return;}
+  box.innerHTML=`<div class="pvw-title ${isS?'':'k'}">${lbl} · ${rows.length} server${rows.length>1?'s':''}</div>
+    <table class="pvw-table"><thead><tr><th>Server</th><th>In</th><th>Out</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td class="v-srv">${esc(r.server)}</td><td>${esc(r.inV)}</td>
+      <td class="${isS?'v-spam':'v-green'}">${isS?'<span class="spam-chip">SPAM</span>':r.outV.toLocaleString()}</td></tr>`).join('')}
+    </tbody></table>`;
+}
+
+function getDate(){const d=document.getElementById('dateInput').value;if(!d)return'';const[y,m,day]=d.split('-');return`${parseInt(m)}/${parseInt(day)}/${y}`;}
+
+function dlExcel(){
+  const wb=XLSX.utils.book_new(),date=getDate();
+  const mkSheet=(data,cols)=>{const ws=XLSX.utils.aoa_to_sheet(data);ws['!cols']=cols;return ws;};
+  XLSX.utils.book_append_sheet(wb,mkSheet([['Date','Server','Level','Level_Num'],...allRows.map(r=>[date,r.server,r.level,r.lNum])],[{wch:12},{wch:22},{wch:8},{wch:12}]),'All Data');
+  LABELS.forEach((lbl,i)=>{const rows=bData[i];if(!rows?.length)return;XLSX.utils.book_append_sheet(wb,mkSheet([['Date','Server','In','Out','Level'],...rows.map(r=>[date,r.server,r.inV,r.outV,lbl])],[{wch:12},{wch:22},{wch:10},{wch:10},{wch:8}]),lbl);});
+  const sp=bData[SPAM_I];if(sp?.length){XLSX.utils.book_append_sheet(wb,mkSheet([['Date','Server','Level'],...sp.map(r=>[date,r.server,'spam'])],[{wch:12},{wch:22},{wch:8}]),'spam');}
+  XLSX.writeFile(wb,'servers_sorted_by_out.xlsx');
+}
+
+function resetSorter(){
+  document.getElementById('inputArea').value='';
+  document.getElementById('dateInput').valueAsDate=new Date();
+  bData=LABELS.map(()=>[]);bData.push([]);allRows=[];activeB=0;
+  document.getElementById('statsBar').style.display='none';
+  document.getElementById('pillsWrap').innerHTML=`<span style="font-size:.75rem;color:var(--text2);font-family:'JetBrains Mono',monospace">Buckets appear after parsing…</span>`;
+  document.getElementById('previewBox').innerHTML=`<div class="no-data"><div class="ico">📊</div><div>Parse data to see results</div></div>`;
+  document.getElementById('dlBtn').disabled=true;
+}
+
+// ══════════════════════════════════════════════════════════════ PROGRESS
+const LEVEL_ORDER={'spam':0,'0.25k':1,'0.5k':2,'1k':3,'2k':4,'3k':5,'4k':6,'8k':7,'12k':8,'16k':9,'20k':10,'24k':11,'30k':12,'35k':13,'35k+':14};
+function lvRank(l){return LEVEL_ORDER[String(l).toLowerCase()]??-1;}
+const BADGE_CLASS={'35k':'lv-35k','35k+':'lv-35k','30k':'lv-30k','24k':'lv-24k','20k':'lv-20k','16k':'lv-16k','12k':'lv-12k','8k':'lv-8k','4k':'lv-4k','3k':'lv-3k','2k':'lv-2k','1k':'lv-1k','0.5k':'lv-05k','0.25k':'lv-025k','spam':'lv-spam'};
+function badgeCls(l){return BADGE_CLASS[String(l).toLowerCase()]||'lv-1k';}
+
+let allDates=[],serverMap={},activeFilter='all',selectedServers=new Set(),pickerBodyOpen=true;
+
+function normDate(raw){
+  raw=raw.trim();
+  let m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m)return`${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+  m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m)return raw;
+  return null;
+}
+function fmtDate(iso){const[y,mo,d]=iso.split('-');return`${parseInt(d)}/${parseInt(mo)}`;}
+
+function analyseProgress(){
+  const raw=document.getElementById('progInput').value.trim();if(!raw)return;
+  const dateSet=new Set();serverMap={};
+  for(let line of raw.split('\n')){
+    line=line.trim();if(!line)continue;
+    if(/^date\t/i.test(line))continue;
+    const parts=line.split(/\t/);
+    let date,server,level;
+    if(parts.length>=3){date=normDate(parts[0]);server=parts[1].trim();level=parts[2].trim().toLowerCase();}
+    else{const wp=line.split(/\s+/);if(wp.length<3)continue;date=normDate(wp[0]);server=wp[1];level=wp[2].toLowerCase();}
+    if(!date||!server||!level||server==='Server')continue;
+    dateSet.add(date);
+    if(!serverMap[server])serverMap[server]={};
+    serverMap[server][date]=level;
+  }
+  allDates=[...dateSet].sort();
+  if(!allDates.length||!Object.keys(serverMap).length){alert('No valid data found.');return;}
+  selectedServers=new Set();
+  document.getElementById('progFilters').style.display='flex';
+  document.getElementById('pickerPanel').style.display='block';
+  document.getElementById('pickerBody').classList.add('open');
+  document.getElementById('pickerChevron').classList.add('open');
+  renderProgressSummary();
+  renderPickerChips();
+  renderProgressTable();
+}
+
+function renderProgressSummary(){
+  const bar=document.getElementById('progSummary');
+  bar.style.display='flex';
+  let improved=0,declined=0,stable=0,spamCount=0;
+  for(const[srv,days]of Object.entries(serverMap)){
+    const vals=allDates.map(d=>days[d]).filter(Boolean);
+    if(vals.some(v=>v==='spam'))spamCount++;
+    const nums=vals.filter(v=>v!=='spam');
+    if(nums.length<2){stable++;continue;}
+    const first=lvRank(nums[0]),last=lvRank(nums[nums.length-1]);
+    if(last>first)improved++;else if(last<first)declined++;else stable++;
+  }
+  bar.innerHTML=`
+    <div class="sum-chip"><div class="sum-chip-val">${Object.keys(serverMap).length}</div><div class="sum-chip-label">Servers</div></div>
+    <div class="sum-chip"><div class="sum-chip-val">${allDates.length}</div><div class="sum-chip-label">Dates</div></div>
+    <div class="sum-chip up"><div class="sum-chip-val">↑ ${improved}</div><div class="sum-chip-label">Improved</div></div>
+    <div class="sum-chip dn"><div class="sum-chip-val">↓ ${declined}</div><div class="sum-chip-label">Declined</div></div>
+    <div class="sum-chip"><div class="sum-chip-val">→ ${stable}</div><div class="sum-chip-label">Stable</div></div>
+    <div class="sum-chip warn"><div class="sum-chip-val">⚠ ${spamCount}</div><div class="sum-chip-label">Had Spam</div></div>`;
+}
+
+function getPTrend(s){
+  const days=serverMap[s];
+  const vals=allDates.map(d=>days[d]).filter(Boolean).filter(v=>v!=='spam');
+  if(vals.length<2)return'same';
+  const f=lvRank(vals[0]),l=lvRank(vals[vals.length-1]);
+  return l>f?'up':l<f?'dn':'same';
+}
+function hasSpam(s){return allDates.some(d=>serverMap[s][d]==='spam');}
+function isMixed(s){
+  const vals=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
+  if(vals.length<2)return false;
+  let ups=0,dns=0;
+  for(let i=1;i<vals.length;i++){const d=lvRank(vals[i])-lvRank(vals[i-1]);if(d>0)ups++;else if(d<0)dns++;}
+  return ups>0&&dns>0;
+}
+
+function setPFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProgressTable();
+}
+
+function togglePickerBody(){
+  pickerBodyOpen=!pickerBodyOpen;
+  document.getElementById('pickerBody').classList.toggle('open',pickerBodyOpen);
+  document.getElementById('pickerChevron').classList.toggle('open',pickerBodyOpen);
+}
+
+function renderPickerChips(){
+  const q=document.getElementById('pickerSearch').value.trim().toLowerCase();
+  const all=Object.keys(serverMap).sort();
+  const filtered=q?all.filter(s=>s.toLowerCase().includes(q)):all;
+  document.getElementById('pickerGrid').innerHTML=filtered.map(s=>{
+    const sel=selectedServers.has(s);
+    const trend=getPTrend(s);
+    const icon=hasSpam(s)?'⚠':trend==='up'?'↑':trend==='dn'?'↓':'→';
+    return`<div class="srv-chip-sel ${sel?'selected':''}" onclick="toggleSrvSel('${esc(s)}')"><span class="chip-trend">${icon}</span>${esc(s)}</div>`;
+  }).join('');
+  updatePickerMeta();
+}
+
+function toggleSrvSel(name){
+  if(selectedServers.has(name))selectedServers.delete(name);else selectedServers.add(name);
+  renderPickerChips();renderProgressTable();
+}
+function pickerSelectAll(){Object.keys(serverMap).forEach(s=>selectedServers.add(s));renderPickerChips();renderProgressTable();}
+function pickerClear(){selectedServers.clear();renderPickerChips();renderProgressTable();}
+
+function updatePickerMeta(){
+  const total=Object.keys(serverMap).length,sel=selectedServers.size;
+  const el=document.getElementById('pickerMeta');
+  if(sel===0){el.textContent=`All ${total} servers`;el.classList.remove('has-sel');}
+  else{el.textContent=`${sel} / ${total} selected`;el.classList.add('has-sel');}
+}
+
+function renderProgressTable(){
+  let servers=Object.keys(serverMap).sort();
+  servers=servers.filter(s=>{
+    if(selectedServers.size>0&&!selectedServers.has(s))return false;
+    if(activeFilter==='improved')return getPTrend(s)==='up';
+    if(activeFilter==='declined')return getPTrend(s)==='dn';
+    if(activeFilter==='spam')return hasSpam(s);
+    if(activeFilter==='stable')return getPTrend(s)==='same'&&!isMixed(s);
+    return true;
+  });
+
+  if(!servers.length){
+    document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">🔍</div><p>No servers match this filter</p></div>`;
+    return;
+  }
+
+  const dateHeaders=allDates.map(d=>`<th class="date-col">${fmtDate(d)}</th>`).join('');
+  const rows=servers.map(srv=>{
+    const days=serverMap[srv];
+    const trend=getPTrend(srv);
+    const mixed=isMixed(srv);
+    const cells=allDates.map((d,i)=>{
+      const lv=days[d];
+      if(!lv)return`<td><span class="lv-empty">—</span></td>`;
+      let arrow='';
+      if(i>0){const prev=allDates.slice(0,i).reverse().find(pd=>days[pd]);if(prev){const diff=lvRank(lv)-lvRank(days[prev]);if(diff>0)arrow=`<span class="trend up">▲</span>`;else if(diff<0)arrow=`<span class="trend dn">▼</span>`;else arrow=`<span class="trend same">—</span>`;}}
+      return`<td><div class="level-cell"><span class="level-badge ${badgeCls(lv)}">${lv}</span>${arrow}</div></td>`;
+    }).join('');
+    let trendBadge;
+    if(mixed)trendBadge=`<span class="trend-summary mixed">↕ Mixed</span>`;
+    else if(trend==='up')trendBadge=`<span class="trend-summary up">↑ Improving</span>`;
+    else if(trend==='dn')trendBadge=`<span class="trend-summary dn">↓ Declining</span>`;
+    else trendBadge=`<span class="trend-summary same">→ Stable</span>`;
+    return`<tr><td class="sticky-col">${esc(srv)}</td>${cells}<td class="trend-col">${trendBadge}</td></tr>`;
+  }).join('');
+
+  document.getElementById('progTable').innerHTML=`<div class="table-scroll"><table class="prog-table">
+    <thead><tr><th class="sticky-col">Server</th>${dateHeaders}<th style="text-align:center">Trend</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+
+function resetProgress(){
+  document.getElementById('progInput').value='';
+  document.getElementById('progSummary').style.display='none';
+  document.getElementById('progFilters').style.display='none';
+  document.getElementById('pickerPanel').style.display='none';
+  document.getElementById('pickerGrid').innerHTML='';
+  document.getElementById('pickerSearch').value='';
+  document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Analyse</p></div>`;
+  serverMap={};allDates=[];selectedServers=new Set();
+  document.querySelectorAll('#progFilters .filter-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+}
+
+
+
+// ══════════════════════════════════════════════════════════════ PERFORMANCE
+let pfBlocks=[], pfStatusF='all', pfIPF='all', selStatusF='all', selSearch='', selSelected=null;
+
+/* ─ Parser ─────────────────────────────────────────────────────────────── */
+function parsePerf(){
+  const raw=document.getElementById('perfInput').value.trim();
+  if(!raw)return;
+  pfBlocks=[];
+
+  // Split into raw chunks on lines starting with TEAM: or 📅 (new block delimiter)
+  const lines=raw.split('\n');
+  const chunks=[];let cur=[];
+  for(const line of lines){
+    const t=line.trim();
+    if(/^(TEAM:|📅)/.test(t)&&cur.length){chunks.push(cur.join('\n'));cur=[];}
+    cur.push(line);
+  }
+  if(cur.length)chunks.push(cur.join('\n'));
+  if(!chunks.length){alert('No blocks detected.');return;}
+
+  chunks.forEach(chunk=>{
+    const ls=chunk.split('\n').map(l=>l.trim()).filter(Boolean);
+    const b={datetime:'',team:'',level:'',byIP:0,servers:[]};
+    ls.forEach(line=>{
+      // TEAM: X | 24K
+      let m=line.match(/^TEAM:\s*([^|]+?)(?:\s*\|\s*(.+))?$/);
+      if(m){b.team=m[1].trim();b.level=(m[2]||'').trim();return;}
+      // 📅 datetime
+      m=line.match(/^📅\s*(.+)/);
+      if(m){b.datetime=m[1].trim();return;}
+      // By IP: 18,000
+      m=line.match(/By IP:\s*([\d,]+)/i);
+      if(m){b.byIP=parseInt(m[1].replace(/,/g,''));return;}
+      // 🟢 name: target sent  OR  🟢name: target sent
+      m=line.match(/🟢\s*(\S+?):\s*([\d,]+)\s+([\d,]+)/);
+      if(m){
+        const name=m[1].replace(/:$/,'');
+        const target=parseInt(m[2].replace(/,/g,''));
+        const sent=parseInt(m[3].replace(/,/g,''));
+        const pct=target>0?sent/target*100:0;
+        const cls=pct>=100?'cl-exc':pct>=70?'cl-good':pct>=60?'cl-warn':'cl-bad';
+        b.servers.push({name,target,sent,pct,cls,down:false});
+        return;
+      }
+      // 💥 name (down)
+      m=line.match(/💥\s*(\S+)/);
+      if(m){b.servers.push({name:m[1].replace(/:.*/,''),target:0,sent:0,pct:0,cls:'cl-bad',down:true});return;}
+    });
+    if(b.servers.length||b.datetime)pfBlocks.push(b);
+  });
+
+  if(!pfBlocks.length){alert('No valid blocks found.');return;}
+  selSelected=null;selSearch='';selStatusF='all';pfStatusF='all';pfIPF='all';
+  document.getElementById('selSearchInput').value='';
+  document.querySelectorAll('.sel-ftab').forEach((b,i)=>b.classList.toggle('active',i===0));
+
+  renderSelPanel();
+  renderFilterBar();
+  renderBlocks();
+  document.getElementById('selPanel').style.display='block';
+  document.getElementById('pfFilterBar').style.display='flex';
+  // open panel
+  document.getElementById('selBody').classList.add('open');
+  document.getElementById('selChevron').classList.add('open');
+}
+
+/* ─ Server status helpers ─────────────────────────────────────────────── */
+function srvStatus(name){
+  const occs=pfBlocks.flatMap(b=>b.servers.filter(s=>s.name===name));
+  if(!occs.length)return'b';
+  const downRatio=occs.filter(s=>s.down).length/occs.length;
+  if(downRatio>0.5)return'b';
+  const avg=occs.reduce((a,s)=>a+s.pct,0)/occs.length;
+  return avg>=70?'g':avg>=60?'w':'b';
+}
+
+/* ─ Selector Panel ────────────────────────────────────────────────────── */
+function toggleSelPanel(){
+  const body=document.getElementById('selBody');
+  const chev=document.getElementById('selChevron');
+  const open=body.classList.toggle('open');
+  chev.classList.toggle('open',open);
+}
+
+function renderSelPanel(){
+  const srvMap=new Map();
+  pfBlocks.forEach(b=>b.servers.forEach(s=>{
+    srvMap.set(s.name,(srvMap.get(s.name)||0)+1);
+  }));
+  const all=[...srvMap.entries()].map(([name,occ])=>({name,occ,st:srvStatus(name)})).sort((a,b)=>a.name.localeCompare(b.name));
+  const g=all.filter(s=>s.st==='g').length,w=all.filter(s=>s.st==='w').length,bCnt=all.filter(s=>s.st==='b').length;
+
+  document.getElementById('selTotalBadge').textContent=all.length+' servers';
+  document.getElementById('selGoodPill').textContent='● '+g+' Good';
+  document.getElementById('selWarnPill').textContent='▲ '+w+' Warning';
+  document.getElementById('selBadPill').textContent='● '+bCnt+' Bad';
+  document.getElementById('selAllCnt').textContent=all.length;
+  document.getElementById('selGoodCnt').textContent=g;
+  document.getElementById('selWarnCnt').textContent=w;
+  document.getElementById('selBadCnt').textContent=bCnt;
+  renderSelGrid(all);
+}
+
+function selDoSearch(){selSearch=document.getElementById('selSearchInput').value.toLowerCase();renderSelGridFiltered();}
+function selSetStatus(s,btn){selStatusF=s;document.querySelectorAll('.sel-ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderSelGridFiltered();}
+
+function renderSelGridFiltered(){
+  const srvMap=new Map();
+  pfBlocks.forEach(b=>b.servers.forEach(s=>{srvMap.set(s.name,(srvMap.get(s.name)||0)+1);}));
+  let all=[...srvMap.entries()].map(([name,occ])=>({name,occ,st:srvStatus(name)})).sort((a,b)=>a.name.localeCompare(b.name));
+  if(selStatusF!=='all')all=all.filter(s=>s.st===selStatusF);
+  if(selSearch)all=all.filter(s=>s.name.toLowerCase().includes(selSearch));
+  renderSelGrid(all);
+}
+
+function renderSelGrid(srvs){
+  document.getElementById('selGrid').innerHTML=srvs.map(s=>`
+    <div class="sel-item ${selSelected===s.name?'sel':''}" onclick="selClickServer('${esc(s.name)}')">
+      <span class="sel-dot ${s.st}"></span>
+      <span class="sel-sname">${esc(s.name)}</span>
+      <span class="sel-occ">${s.occ}</span>
+    </div>`).join('');
+}
+
+function selClickServer(name){
+  selSelected=(selSelected===name)?null:name;
+  renderSelGridFiltered();
+  if(!selSelected){document.getElementById('selTlPanel').style.display='none';return;}
+  showSelTl(name);
+}
+
+function showSelTl(name){
+  const st=srvStatus(name);
+  const stLabel={g:'GOOD',w:'WARNING',b:'BAD'}[st];
+  document.getElementById('selTlName').textContent=name;
+  const badge=document.getElementById('selTlBadge');
+  badge.textContent=stLabel;badge.className='sel-tl-badge '+st;
+
+  const colors={g:'#10b981',w:'#f59e0b',b:'#ef4444'};
+  const occs=pfBlocks.flatMap(b=>{
+    const s=b.servers.find(sv=>sv.name===name);
+    return s?[{...s,datetime:b.datetime}]:[];
+  });
+
+  document.getElementById('selTlRows').innerHTML=occs.map(o=>{
+    if(o.down){
+      return`<div class="sel-tl-row" style="border-color:#ef4444">
+        <div class="sel-tl-time">⏱ ${esc(o.datetime)}</div>
+        <div style="flex:1;color:#ef4444;font-weight:700;font-size:.85rem;">💥 SERVER DOWN</div>
+        <div class="sel-tl-pct" style="color:#ef4444">—</div>
+      </div>`;
+    }
+    const col=o.cls==='cl-exc'?colors.g:o.cls==='cl-good'?colors.g:o.cls==='cl-warn'?colors.w:colors.b;
+    const pctColor=o.pct>=70?colors.g:o.pct>=60?colors.w:colors.b;
+    return`<div class="sel-tl-row" style="border-color:${col}">
+      <div class="sel-tl-time">⏱ ${esc(o.datetime)}</div>
+      <div class="sel-tl-vals">
+        <div class="sel-tl-val"><div class="sel-tl-lbl">TARGET</div><div class="sel-tl-num">${o.target.toLocaleString()}</div></div>
+        <div class="sel-tl-val"><div class="sel-tl-lbl">SENT</div><div class="sel-tl-num" style="color:${col}">${o.sent.toLocaleString()}</div></div>
+      </div>
+      <div class="sel-tl-pct" style="color:${pctColor}">${o.pct.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('selTlPanel').style.display='block';
+}
+
+/* ─ Filter Bar ────────────────────────────────────────────────────────── */
+function renderFilterBar(){
+  const ips=[...new Set(pfBlocks.map(b=>b.byIP).filter(Boolean))].sort((a,b)=>a-b);
+  const ipGrp=document.getElementById('pfIPGroup');
+  ipGrp.innerHTML=ips.length
+    ?`<span class="pf-glabel">By IP:</span>
+       <button class="pf-ipbtn active" onclick="pfSetIP('all',this)">ALL</button>
+       ${ips.map(ip=>`<button class="pf-ipbtn" onclick="pfSetIP(${ip},this)">${Number(ip).toLocaleString()}</button>`).join('')}`
+    :'';
+}
+
+function pfSetStatus(s,btn){
+  pfStatusF=s;
+  document.querySelectorAll('.pf-sbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBlocks();
+}
+function pfSetIP(v,btn){
+  pfIPF=v==='all'?'all':Number(v);
+  document.querySelectorAll('.pf-ipbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderBlocks();
+}
+
+/* ─ Render Blocks ─────────────────────────────────────────────────────── */
+function renderBlocks(){
+  let blocks=pfBlocks;
+  if(pfIPF!=='all')blocks=blocks.filter(b=>b.byIP===pfIPF);
+  const container=document.getElementById('pfResults');
+  if(!blocks.length){container.innerHTML='<div class="empty-state"><div class="ico">🔍</div><p>No blocks match filter</p></div>';return;}
+
+  const html=blocks.map((block,bi)=>{
+    let srvs=block.servers;
+    if(pfStatusF==='good')srvs=srvs.filter(s=>!s.down&&s.pct>=70);
+    else if(pfStatusF==='bad')srvs=srvs.filter(s=>s.down||s.pct<60);
+    if(!srvs.length)return'';
+
+    const cards=srvs.map(s=>{
+      if(s.down)return`<div class="pf-card cl-down" onclick="selClickServer('${esc(s.name)}')">
+        <div class="pf-card-top">
+          <span class="pf-cname">☰ ${esc(s.name)}</span>
+          <span class="pf-cstatus cl-down">DOWN</span>
+        </div>
+        <div style="color:#ef4444;text-align:center;padding:10px;font-size:.82rem;font-weight:700;">💥 Server Down</div>
+      </div>`;
+      const statusLabel=s.cls==='cl-exc'?'EXCELLENT':s.cls==='cl-good'?'GOOD':s.cls==='cl-warn'?'WARNING':'BAD';
+      return`<div class="pf-card ${s.cls}" onclick="selClickServer('${esc(s.name)}')">
+        <div class="pf-card-top">
+          <span class="pf-cname">☰ ${esc(s.name)}</span>
+          <span class="pf-cstatus ${s.cls}">${statusLabel}</span>
+        </div>
+        <div class="pf-cstats">
+          <div class="pf-cstat"><div class="pf-cslbl">TARGET</div><div class="pf-csval">${s.target.toLocaleString()}</div></div>
+          <div class="pf-cstat" style="text-align:right"><div class="pf-cslbl">SENT</div><div class="pf-csval ${s.cls}">${s.sent.toLocaleString()}</div></div>
+        </div>
+        <div class="pf-cpbar"><div class="pf-cpfill ${s.cls}" style="width:${Math.min(s.pct,100).toFixed(1)}%"></div></div>
+        <div class="pf-cpct">${s.pct.toFixed(1)}% of target</div>
+      </div>`;
+    }).join('');
+    if(!cards.trim())return'';
+
+    return`<div class="pf-block">
+      <div class="pf-block-head">
+        ${block.datetime?`<span class="pf-btime">⏱ ${esc(block.datetime)}</span>`:''}
+        ${block.byIP?`<span class="pf-bip">${Number(block.byIP).toLocaleString()} per IP</span>`:''}
+        <span class="pf-bnodomain">No domain</span>
+        <button class="pf-bcopy" onclick="pfCopyBlock(${bi},event)">📋 Copy Names</button>
+      </div>
+      <div class="pf-cards">${cards}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  container.innerHTML=html||'<div class="empty-state"><div class="ico">🔍</div><p>No servers match filter</p></div>';
+}
+
+/* ─ Copy helpers ──────────────────────────────────────────────────────── */
+function pfCopyAll(){
+  let blocks=pfIPF==='all'?pfBlocks:pfBlocks.filter(b=>b.byIP===pfIPF);
+  const names=[...new Set(blocks.flatMap(b=>{
+    let s=b.servers;
+    if(pfStatusF==='good')s=s.filter(x=>!x.down&&x.pct>=70);
+    else if(pfStatusF==='bad')s=s.filter(x=>x.down||x.pct<60);
+    return s.map(x=>x.name);
+  }))];
+  if(!names.length)return;
+  navigator.clipboard.writeText(names.join('\n')).then(()=>{
+    const btn=document.querySelector('.pf-copy-all');
+    const orig=btn.innerHTML;btn.innerHTML='✅ Copied!';
+    setTimeout(()=>{btn.innerHTML=orig;},2000);
+  });
+}
+
+function pfCopyBlock(bi,e){
+  e.stopPropagation();
+  const block=pfBlocks[bi];if(!block)return;
+  let s=block.servers;
+  if(pfStatusF==='good')s=s.filter(x=>!x.down&&x.pct>=70);
+  else if(pfStatusF==='bad')s=s.filter(x=>x.down||x.pct<60);
+  navigator.clipboard.writeText(s.map(x=>x.name).join('\n')).then(()=>{
+    const btn=e.target;const orig=btn.innerHTML;btn.innerHTML='✅ Copied!';
+    setTimeout(()=>{btn.innerHTML=orig;},2000);
+  });
+}
+
+function resetPerf(){
+  document.getElementById('perfInput').value='';
+  pfBlocks=[];pfStatusF='all';pfIPF='all';selSelected=null;selSearch='';selStatusF='all';
+  document.getElementById('selPanel').style.display='none';
+  document.getElementById('pfFilterBar').style.display='none';
+  document.getElementById('pfResults').innerHTML='<div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Parse</p></div>';
+  document.getElementById('selTlPanel').style.display='none';
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+document.getElementById('dateInput').valueAsDate=new Date();
+document.getElementById('newSrv').addEventListener('keydown',e=>{if(e.key==='Enter')addOne();});
+document.getElementById('inputArea').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')parseData();});
+renderDrawer();
+</script>
+
+
+<!-- ═══════════════════════════════════════════════════════ PERFORMANCE PANEL -->
+<div class="panel" id="panel-perf">
+<div class="main">
+
+  <!-- Input card -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-head"><div class="card-title">Input Data</div></div>
+    <div class="hint-text">Paste performance reports. Blocks auto-detected by <strong>TEAM:</strong> or <strong>📅</strong> timestamp lines.</div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
+      <textarea id="perfInput" style="height:180px" placeholder="TEAM: C | 24K
+📅 18/02 00:04:05
+By IP: 18,000
+🟢 s_cmh6_5787: 90139 1188
+🟢 s_cmh6_5897: 36128 11
+💥 s_cmh6_5999
+❗️ Errors Details:
+Connection closed
+5.79.125.25"></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="primary" onclick="parsePerf()">▶ Parse</button>
+        <button class="secondary" onclick="resetPerf()">↺</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Server Selector Panel -->
+  <div class="sel-panel" id="selPanel" style="display:none">
+    <div class="sel-header" onclick="toggleSelPanel()">
+      <div class="sel-header-left">
+        <div class="sel-header-title">☰ Server Selector <span class="sel-count-badge" id="selTotalBadge">0 servers</span></div>
+      </div>
+      <span class="sel-chevron" id="selChevron">▼</span>
+    </div>
+    <div class="sel-body" id="selBody">
+      <!-- stats + search -->
+      <div class="sel-top-row">
+        <div class="sel-stat-pill g" id="selGoodPill">● 0 Good</div>
+        <div class="sel-stat-pill w" id="selWarnPill">▲ 0 Warning</div>
+        <div class="sel-stat-pill b" id="selBadPill">● 0 Bad</div>
+        <div class="sel-search-wrap">
+          <input type="text" id="selSearchInput" placeholder="Search server name..." oninput="selDoSearch()"/>
+          <button class="sel-search-btn" onclick="selDoSearch()">🔍 Search</button>
+        </div>
+      </div>
+      <!-- filter tabs -->
+      <div class="sel-ftabs">
+        <div class="sel-ftab active" onclick="selSetStatus('all',this)">☰ All <span class="fcnt" id="selAllCnt">0</span></div>
+        <div class="sel-ftab" onclick="selSetStatus('g',this)">✓ Good <span class="fcnt" id="selGoodCnt">0</span></div>
+        <div class="sel-ftab" onclick="selSetStatus('w',this)">⚠ Warning <span class="fcnt" id="selWarnCnt">0</span></div>
+        <div class="sel-ftab" onclick="selSetStatus('b',this)">✕ Bad <span class="fcnt" id="selBadCnt">0</span></div>
+      </div>
+      <!-- chips grid -->
+      <div class="sel-grid" id="selGrid"></div>
+      <!-- timeline -->
+      <div class="sel-tl" id="selTlPanel" style="display:none">
+        <div class="sel-tl-head">
+          <div class="sel-tl-name">☰ <span id="selTlName">–</span></div>
+          <span class="sel-tl-badge" id="selTlBadge">–</span>
+        </div>
+        <div class="sel-tl-rows" id="selTlRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="pf-filterbar" id="pfFilterBar" style="display:none">
+    <div class="pf-group">
+      <span class="pf-glabel">Status:</span>
+      <button class="pf-sbtn active" onclick="pfSetStatus('all',this)">ALL</button>
+      <button class="pf-sbtn" onclick="pfSetStatus('good',this)">GOOD (≥70%)</button>
+      <button class="pf-sbtn" onclick="pfSetStatus('bad',this)">BAD (Down or &lt;60%)</button>
+    </div>
+    <div class="pf-group" id="pfIPGroup"></div>
+    <button class="pf-copy-all" onclick="pfCopyAll()">📋 Copy Names</button>
+  </div>
+
+  <!-- Results -->
+  <div class="pf-blocks" id="pfResults">
+    <div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Parse</p></div>
+  </div>
+
+</div>
+</div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
-
-    <script>
-        // ==================== TAB SWITCHING ====================
-        function switchTab(index) {
-            document.querySelectorAll('.tool-tab').forEach((btn, i) => {
-                if (i === index) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            
-            document.querySelectorAll('.tool-section').forEach((section, i) => {
-                if (i === index) section.classList.add('active');
-                else section.classList.remove('active');
-            });
-        }
-
-        // ==================== TOAST NOTIFICATION ====================
-        function showToast(message, duration = 2000, isError = false) {
-            const toastContainer = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'toast-message';
-            toast.style.background = isError ? '#dc3545' : '#3a56d4';
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, duration);
-        }
-
-        // ==================== SERVER SELECTOR STATE ====================
-        let serverSelectorCollapsed = true;
-        let currentServerFilter = 'all';
-        let serverSearchTerm = '';
-        let selectedServer = null;
-        let allServersList = [];
-
-        function toggleServerSelector() {
-            serverSelectorCollapsed = !serverSelectorCollapsed;
-            const content = document.getElementById('serverSelectorContent');
-            const icon = document.getElementById('selectorToggleIcon');
-            const header = document.querySelector('.server-selector-header');
-            
-            if (serverSelectorCollapsed) {
-                content.classList.add('collapsed');
-                icon.style.transform = 'rotate(-90deg)';
-                header.classList.add('collapsed');
-            } else {
-                content.classList.remove('collapsed');
-                icon.style.transform = 'rotate(0deg)';
-                header.classList.remove('collapsed');
-            }
-        }
-
-        function filterServers() {
-            serverSearchTerm = document.getElementById('serverSearchInput').value.toLowerCase();
-            renderServersGrid();
-        }
-
-        function filterServersByStatus(status) {
-            currentServerFilter = status;
-            
-            document.querySelectorAll('.server-filter-tab').forEach(tab => {
-                if (tab.textContent.toLowerCase().includes(status) || 
-                    (status === 'all' && tab.textContent.includes('All'))) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-            
-            renderServersGrid();
-        }
-
-        function selectServer(serverName) {
-            selectedServer = serverName;
-            
-            document.querySelectorAll('.server-selector-item').forEach(item => {
-                if (item.dataset.server === serverName) {
-                    item.classList.add('selected');
-                } else {
-                    item.classList.remove('selected');
-                }
-            });
-            
-            showServerTimeline(serverName);
-        }
-
-        function getServerOverallStatus(serverName) {
-            let totalPercentage = 0;
-            let count = 0;
-            let hasDown = false;
-            
-            blocks.forEach(block => {
-                const server = block.servers.find(s => s.name === serverName);
-                if (server) {
-                    if (server.isDown) {
-                        hasDown = true;
-                        totalPercentage += 0;
-                    } else {
-                        totalPercentage += server.percentage;
-                    }
-                    count++;
-                }
-            });
-            
-            if (count === 0) return 'good';
-            
-            // If more than half the occurrences are down, mark as bad
-            const downCount = blocks.filter(block => {
-                const server = block.servers.find(s => s.name === serverName);
-                return server && server.isDown;
-            }).length;
-            
-            if (downCount > count / 2) return 'bad';
-            
-            const avgPercentage = totalPercentage / count;
-            
-            if (avgPercentage >= 100) return 'good';
-            if (avgPercentage >= 70) return 'good';
-            if (avgPercentage >= 60) return 'warning';
-            return 'bad';
-        }
-
-        function showServerTimeline(serverName) {
-            const timelineDiv = document.getElementById('serverTimeline');
-            const infoDiv = document.getElementById('selectedServerInfo');
-            
-            const serverOccurrences = [];
-            blocks.forEach(block => {
-                const server = block.servers.find(s => s.name === serverName);
-                if (server) {
-                    serverOccurrences.push({
-                        datetime: block.datetime,
-                        byIP: block.byIP,
-                        domain: block.domain || 'N/A',
-                        ...server
-                    });
-                }
-            });
-            
-            if (serverOccurrences.length === 0) {
-                infoDiv.style.display = 'none';
-                return;
-            }
-            
-            const overallStatus = getServerOverallStatus(serverName);
-            
-            document.getElementById('selectedServerName').textContent = serverName;
-            const statusSpan = document.getElementById('selectedServerStatus');
-            statusSpan.textContent = overallStatus.toUpperCase();
-            statusSpan.className = `selected-server-status-badge ${overallStatus}`;
-            
-            let timelineHtml = '';
-            serverOccurrences.sort((a, b) => a.datetime.localeCompare(b.datetime)).forEach(occ => {
-                if (occ.isDown) {
-                    timelineHtml += `
-                        <div class="server-timeline-item" style="border-left-color: #ef4444;">
-                            <div class="timeline-time"><i class="far fa-clock"></i> ${occ.datetime}</div>
-                            <div style="flex:1; color: #ef4444; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> SERVER DOWN</div>
-                            <div class="timeline-percentage" style="color: #ef4444;">Domain: ${occ.domain}</div>
-                        </div>
-                    `;
-                } else {
-                    const statusColor = occ.status === 'excellent' ? '#10b981' : 
-                                      occ.status === 'good' ? '#3b82f6' :
-                                      occ.status === 'warning' ? '#f59e0b' : '#ef4444';
-                    
-                    timelineHtml += `
-                        <div class="server-timeline-item" style="border-left-color: ${statusColor};">
-                            <div class="timeline-time"><i class="far fa-clock"></i> ${occ.datetime}</div>
-                            <div class="timeline-stats">
-                                <div class="timeline-target">
-                                    <span class="timeline-label">TARGET</span>
-                                    <span class="timeline-value">${occ.target.toLocaleString()}</span>
-                                </div>
-                                <div class="timeline-sent">
-                                    <span class="timeline-label">SENT</span>
-                                    <span class="timeline-value" style="color: ${statusColor};">${occ.sent.toLocaleString()}</span>
-                                </div>
-                            </div>
-                            <div class="timeline-percentage" style="color: ${statusColor};">
-                                ${occ.percentage.toFixed(1)}%
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            
-            timelineDiv.innerHTML = timelineHtml;
-            infoDiv.style.display = 'block';
-        }
-
-        function renderServersGrid() {
-            if (!blocks || blocks.length === 0) return;
-            
-            const serverMap = new Map();
-            
-            blocks.forEach(block => {
-                block.servers.forEach(server => {
-                    if (!serverMap.has(server.name)) {
-                        serverMap.set(server.name, {
-                            name: server.name,
-                            occurrences: 1
-                        });
-                    } else {
-                        const existing = serverMap.get(server.name);
-                        existing.occurrences++;
-                    }
-                });
-            });
-            
-            allServersList = Array.from(serverMap.values()).map(s => ({
-                ...s,
-                status: getServerOverallStatus(s.name)
-            }));
-            
-            const goodCount = allServersList.filter(s => s.status === 'good').length;
-            const warningCount = allServersList.filter(s => s.status === 'warning').length;
-            const badCount = allServersList.filter(s => s.status === 'bad').length;
-            
-            document.getElementById('totalServersBadge').textContent = `${allServersList.length} servers`;
-            document.getElementById('allServersCount').textContent = allServersList.length;
-            document.getElementById('goodFilterCount').textContent = goodCount;
-            document.getElementById('warningFilterCount').textContent = warningCount;
-            document.getElementById('badFilterCount').textContent = badCount;
-            document.getElementById('goodServersCount').textContent = `${goodCount} Good`;
-            document.getElementById('warningServersCount').textContent = `${warningCount} Warning`;
-            document.getElementById('badServersCount').textContent = `${badCount} Bad`;
-            
-            let filteredServers = [...allServersList];
-            
-            if (currentServerFilter !== 'all') {
-                filteredServers = filteredServers.filter(s => s.status === currentServerFilter);
-            }
-            
-            if (serverSearchTerm) {
-                filteredServers = filteredServers.filter(s => 
-                    s.name.toLowerCase().includes(serverSearchTerm)
-                );
-            }
-            
-            const grid = document.getElementById('serversGrid');
-            
-            if (filteredServers.length === 0) {
-                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #64748b;">No servers match the filters</div>';
-                return;
-            }
-            
-            let gridHtml = '';
-            filteredServers.sort((a, b) => a.name.localeCompare(b.name)).forEach(server => {
-                const statusDotClass = server.status;
-                const selectedClass = selectedServer === server.name ? 'selected' : '';
-                
-                gridHtml += `
-                    <div class="server-selector-item ${selectedClass}" data-server="${server.name}" onclick="selectServer('${server.name}')">
-                        <span class="status-dot ${statusDotClass}"></span>
-                        <span class="server-name">${server.name}</span>
-                        <span style="font-size: 0.7rem; opacity: 0.7; background: #e2e8f0; padding: 2px 6px; border-radius: 12px;">${server.occurrences}</span>
-                    </div>
-                `;
-            });
-            
-            grid.innerHTML = gridHtml;
-            
-            if (selectedServer) {
-                const exists = allServersList.some(s => s.name === selectedServer);
-                if (!exists) {
-                    selectedServer = null;
-                    document.getElementById('selectedServerInfo').style.display = 'none';
-                } else {
-                    document.querySelectorAll('.server-selector-item').forEach(item => {
-                        if (item.dataset.server === selectedServer) {
-                            item.classList.add('selected');
-                        }
-                    });
-                    showServerTimeline(selectedServer);
-                }
-            }
-        }
-
-        // ==================== TOOL 1: SERVER PERFORMANCE ANALYZER ====================
-        let blocks = [];
-        let originalInput = '';
-        let currentStatusFilter = 'all';
-        let currentIPFilter = 'all';
-        let currentDomainFilter = 'all';
-
-        window.parseData = function() {
-            const text = document.getElementById('inputData').value;
-            if (!text.trim()) {
-                showToast('Please paste some data first', 2000, true);
-                return;
-            }
-            
-            originalInput = text;
-            
-            // The format is: [block content] ------ \n RP: domain \n DOO: domain \n\n [next block]
-            // So RP/DOO appear AFTER the ------ separator, belonging to the block BEFORE it.
-            // Strategy: split by the pattern "------\n    RP:" to keep domain with its block.
-            
-            // First, pair each block with its domain by splitting on newlines and tracking sections
-            const rawChunks = text.split('------');
-            // rawChunks[0] = first block content
-            // rawChunks[1] = "RP:...\nDOO:...\n\n[second block content]"
-            // etc.
-            
-            // Each chunk after index 0 starts with RP/DOO lines for the PREVIOUS block
-            const parsedBlocks = [];
-            
-            for (let i = 0; i < rawChunks.length; i++) {
-                const chunk = rawChunks[i];
-                if (!chunk.trim()) continue;
-                
-                const lines = chunk.split('\n').map(l => l.trim()).filter(l => l);
-                
-                if (i === 0) {
-                    // First chunk: pure block content, no domain yet (domain comes after first ------ )
-                    const blockData = parseBlockLines(lines);
-                    if (blockData) parsedBlocks.push(blockData);
-                } else {
-                    // This chunk starts with RP:/DOO: lines for the PREVIOUS block,
-                    // then contains the next block's content after a blank separator
-                    
-                    // Extract domain lines at the start
-                    let domain = null;
-                    let contentStartIndex = 0;
-                    
-                    for (let j = 0; j < lines.length; j++) {
-                        const line = lines[j];
-                        if (line.startsWith('RP:')) {
-                            const rpMatch = line.match(/RP:\s*(.+)/);
-                            if (rpMatch) {
-                                const val = rpMatch[1].trim();
-                                if (!val.includes('[RDNS]') && !val.includes('N/A') && val.includes('.')) {
-                                    domain = val;
-                                }
-                            }
-                            contentStartIndex = j + 1;
-                        } else if (line.startsWith('DOO:')) {
-                            if (!domain) {
-                                const dooMatch = line.match(/DOO:\s*(.+)/);
-                                if (dooMatch) {
-                                    const val = dooMatch[1].trim();
-                                    if (!val.includes('[RDNS]') && !val.includes('N/A') && val.includes('.')) {
-                                        domain = val;
-                                    }
-                                }
-                            }
-                            contentStartIndex = j + 1;
-                        } else if (line.startsWith('RP:') || line.startsWith('DOO:')) {
-                            contentStartIndex = j + 1;
-                        } else if (domain !== undefined && contentStartIndex > 0) {
-                            break;
-                        }
-                    }
-                    
-                    // Assign domain to previous block
-                    if (parsedBlocks.length > 0) {
-                        parsedBlocks[parsedBlocks.length - 1].domain = domain;
-                    }
-                    
-                    // Parse the rest as the next block
-                    const remainingLines = lines.slice(contentStartIndex);
-                    if (remainingLines.length > 0) {
-                        const blockData = parseBlockLines(remainingLines);
-                        if (blockData) parsedBlocks.push(blockData);
-                    }
-                }
-            }
-            
-            function parseBlockLines(lines) {
-                const blockData = {
-                    datetime: '',
-                    byIP: 0,
-                    domain: null,
-                    servers: [],
-                    rawText: lines.join('\n')
-                };
-                
-                lines.forEach(line => {
-                    if (line.match(/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2}/)) {
-                        blockData.datetime = line;
-                    }
-                    
-                    if (line.includes('By IP:')) {
-                        const match = line.match(/[\d,.]+/);
-                        if (match) {
-                            blockData.byIP = parseFloat(match[0].replace(/,/g, ''));
-                        }
-                    }
-                    
-                    if (line.startsWith('🟢')) {
-                        const match = line.match(/🟢\s+([^:]+):\s+(\d+)\s+(\d+)/);
-                        if (match) {
-                            const target = parseInt(match[2]);
-                            const sent = parseInt(match[3]);
-                            const percentage = target > 0 ? (sent / target * 100) : 0;
-                            
-                            let status = '';
-                            if (percentage >= 100) status = 'excellent';
-                            else if (percentage >= 70) status = 'good';
-                            else if (percentage >= 60) status = 'warning';
-                            else status = 'bad';
-                            
-                            blockData.servers.push({
-                                name: match[1].trim(),
-                                target: target,
-                                sent: sent,
-                                percentage: percentage,
-                                status: status,
-                                isDown: false,
-                                raw: line
-                            });
-                        }
-                    }
-                    
-                    if (line.startsWith('💥')) {
-                        const match = line.match(/💥\s+([^:]+)/);
-                        if (match) {
-                            const serverName = match[1].trim().split(':')[0];
-                            blockData.servers.push({
-                                name: serverName,
-                                target: 0,
-                                sent: 0,
-                                percentage: 0,
-                                status: 'bad',
-                                isDown: true,
-                                raw: line
-                            });
-                        }
-                    }
-                });
-                
-                return blockData.servers.length > 0 ? blockData : null;
-            }
-            
-            blocks = parsedBlocks;
-
-            if (blocks.length === 0) {
-                showToast('No valid data blocks found', 2000, true);
-                return;
-            }
-
-            document.getElementById('serverSelectorSection').style.display = 'block';
-            
-            selectedServer = null;
-            currentServerFilter = 'all';
-            serverSearchTerm = '';
-            document.getElementById('serverSearchInput').value = '';
-            
-            const content = document.getElementById('serverSelectorContent');
-            const icon = document.getElementById('selectorToggleIcon');
-            content.classList.add('collapsed');
-            icon.style.transform = 'rotate(-90deg)';
-            document.querySelector('.server-selector-header').classList.add('collapsed');
-            serverSelectorCollapsed = true;
-            
-            renderServersGrid();
-
-            displayFilters();
-            displayBlocks();
-            document.getElementById('results').classList.remove('hidden');
-            showToast(`Found ${blocks.length} data blocks`);
-        };
-
-        function displayFilters() {
-            const ipValues = [...new Set(blocks.map(b => b.byIP).filter(ip => ip > 0))].sort((a, b) => a - b);
-            const domainValues = [...new Set(blocks.map(b => b.domain).filter(d => d))].sort();
-            
-            let filterHTML = `
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <span class="filter-label">Status:</span>
-                        <button class="filter-btn ${currentStatusFilter === 'all' ? 'active' : ''}" onclick="filterByStatus('all')">ALL</button>
-                        <button class="filter-btn ${currentStatusFilter === 'good' ? 'active' : ''}" onclick="filterByStatus('good')">GOOD (≥70%)</button>
-                        <button class="filter-btn ${currentStatusFilter === 'bad' ? 'active' : ''}" onclick="filterByStatus('bad')">BAD (Down or <60%)</button>
-                    </div>
-            `;
-            
-            if (ipValues.length > 0) {
-                filterHTML += `
-                    <div class="ip-filter-group">
-                        <span class="filter-label">By IP:</span>
-                        <button class="ip-filter-btn ${currentIPFilter === 'all' ? 'active' : ''}" onclick="filterByIP('all')">ALL</button>
-                `;
-                
-                ipValues.forEach(ip => {
-                    filterHTML += `<button class="ip-filter-btn ${currentIPFilter === ip ? 'active' : ''}" onclick="filterByIP(${ip})">${ip.toLocaleString()}</button>`;
-                });
-                
-                filterHTML += `</div>`;
-            }
-            
-            if (domainValues.length > 0) {
-                filterHTML += `
-                    <div class="domain-filter-group">
-                        <span class="filter-label">By Domain:</span>
-                        <button class="domain-filter-btn ${currentDomainFilter === 'all' ? 'active' : ''}" onclick="filterByDomain('all')">ALL</button>
-                        <button class="domain-filter-btn ${currentDomainFilter === '__has_domain__' ? 'active' : ''}" onclick="filterByDomain('__has_domain__')">🌐 With Domain</button>
-                        <button class="domain-filter-btn ${currentDomainFilter === '__no_domain__' ? 'active' : ''}" onclick="filterByDomain('__no_domain__')" style="border-color:#94a3b8;background:#f1f5f9;color:#475569;">📡 RDNS Only</button>
-                `;
-                
-                domainValues.forEach(domain => {
-                    filterHTML += `<button class="domain-filter-btn ${currentDomainFilter === domain ? 'active' : ''}" onclick="filterByDomain('${domain}')">${domain}</button>`;
-                });
-                
-                filterHTML += `</div>`;
-            }
-            
-            filterHTML += `</div><div class="filter-row"><div class="action-buttons">
-                    <button class="btn btn-outline btn-sm" onclick="copySelectedNames()">
-                        <i class="fas fa-copy"></i> Copy Names
-                    </button>
-                </div></div>
-            `;
-            
-            document.getElementById('filterSection').innerHTML = filterHTML;
-        }
-
-        function displayBlocks() {
-            const container = document.getElementById('blocksContainer');
-            
-            let filteredBlocks = blocks;
-            
-            // Apply IP filter
-            if (currentIPFilter !== 'all') {
-                filteredBlocks = filteredBlocks.filter(b => b.byIP === currentIPFilter);
-            }
-            
-            // Apply Domain filter
-            if (currentDomainFilter === '__has_domain__') {
-                filteredBlocks = filteredBlocks.filter(b => b.domain && b.domain.trim() !== '');
-            } else if (currentDomainFilter === '__no_domain__') {
-                filteredBlocks = filteredBlocks.filter(b => !b.domain || b.domain.trim() === '');
-            } else if (currentDomainFilter !== 'all') {
-                filteredBlocks = filteredBlocks.filter(b => b.domain && b.domain === currentDomainFilter);
-            }
-            
-            if (filteredBlocks.length === 0) {
-                container.innerHTML = '<div class="no-data"><i class="fas fa-info-circle"></i> No blocks match the selected filters</div>';
-                return;
-            }
-            
-            const blocksHTML = filteredBlocks.map((block, index) => {
-                let filteredServers = block.servers;
-                if (currentStatusFilter === 'good') {
-                    filteredServers = block.servers.filter(s => !s.isDown && s.percentage >= 70);
-                } else if (currentStatusFilter === 'bad') {
-                    filteredServers = block.servers.filter(s => s.isDown || (!s.isDown && s.percentage < 60));
-                }
-                
-                if (filteredServers.length === 0) return '';
-                
-                return `
-                    <div class="data-block" data-block-datetime="${block.datetime}" data-block-ip="${block.byIP}" data-block-domain="${block.domain || ''}">
-                        <div class="block-header">
-                            <span class="time-badge"><i class="far fa-clock"></i> ${block.datetime}</span>
-                            ${block.byIP ? `<span class="ip-badge"><i class="fas fa-bullseye"></i> ${block.byIP.toLocaleString()} per IP</span>` : ''}
-                            ${block.domain ? `<span class="domain-badge"><i class="fas fa-globe"></i> ${block.domain}</span>` : '<span class="no-domain">No domain</span>'}
-                            <div class="block-actions">
-                                <button class="btn btn-outline btn-sm copy-block-btn" onclick="copyBlockNames('${block.datetime}', ${block.byIP}, event)">
-                                    <i class="fas fa-copy"></i> Copy Names
-                                </button>
-                            </div>
-                        </div>
-                        <div class="servers-grid">
-                            ${filteredServers.map(server => {
-                                if (server.isDown) {
-                                    return `
-                                        <div class="server-card bad" onclick="selectServer('${server.name}')" style="cursor: pointer;">
-                                            <div class="server-header">
-                                                <span class="server-name"><i class="fas fa-exclamation-triangle"></i> ${server.name}</span>
-                                                <span class="server-status bad">DOWN</span>
-                                            </div>
-                                            <div style="color: #64748b; text-align: center; padding: 10px;">
-                                                Server Down
-                                            </div>
-                                        </div>
-                                    `;
-                                } else {
-                                    return `
-                                        <div class="server-card ${server.status}" onclick="selectServer('${server.name}')" style="cursor: pointer;">
-                                            <div class="server-header">
-                                                <span class="server-name"><i class="fas fa-server"></i> ${server.name}</span>
-                                                <span class="server-status ${server.status}">${server.status.toUpperCase()}</span>
-                                            </div>
-                                            
-                                            <div class="stats-row">
-                                                <div class="target-box">
-                                                    <div class="label">TARGET</div>
-                                                    <div class="value">${server.target.toLocaleString()}</div>
-                                                </div>
-                                                <div class="sent-box">
-                                                    <div class="label">SENT</div>
-                                                    <div class="value ${server.status}">${server.sent.toLocaleString()}</div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="progress-bar">
-                                                <div class="progress-fill ${server.status}" 
-                                                     style="width: ${Math.min(server.percentage, 100)}%"></div>
-                                            </div>
-                                            <div class="percentage">
-                                                ${server.percentage.toFixed(1)}% of target
-                                            </div>
-                                        </div>
-                                    `;
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            container.innerHTML = blocksHTML;
-        }
-
-        window.filterByStatus = function(status) {
-            currentStatusFilter = status;
-            displayFilters();
-            displayBlocks();
-        };
-
-        window.filterByIP = function(ip) {
-            currentIPFilter = ip;
-            currentDomainFilter = 'all'; // Reset domain filter when IP is selected
-            displayFilters();
-            displayBlocks();
-        };
-
-        window.filterByDomain = function(domain) {
-            currentDomainFilter = domain;
-            currentIPFilter = 'all'; // Reset IP filter when domain is selected
-            displayFilters();
-            displayBlocks();
-        };
-
-        window.resetFilters = function() {
-            currentStatusFilter = 'all';
-            currentIPFilter = 'all';
-            currentDomainFilter = 'all';
-            displayFilters();
-            displayBlocks();
-            showToast('Filters reset');
-        };
-
-        window.resetServerPerformance = function() {
-            document.getElementById('inputData').value = '';
-            
-            blocks = [];
-            originalInput = '';
-            
-            currentStatusFilter = 'all';
-            currentIPFilter = 'all';
-            currentDomainFilter = 'all';
-            
-            document.getElementById('results').classList.add('hidden');
-            document.getElementById('serverSelectorSection').style.display = 'none';
-            
-            showToast('Server Performance - cleared');
-        };
-
-        function copySelectedNames() {
-            if (blocks.length === 0) {
-                showToast('No data to copy', 2000, true);
-                return;
-            }
-
-            let filteredBlocks = blocks;
-            if (currentIPFilter !== 'all') {
-                filteredBlocks = filteredBlocks.filter(b => b.byIP === currentIPFilter);
-            }
-            if (currentDomainFilter !== 'all') {
-                filteredBlocks = filteredBlocks.filter(b => b.domain === currentDomainFilter);
-            }
-
-            let allNames = [];
-            
-            filteredBlocks.forEach(block => {
-                let filteredServers = block.servers;
-                if (currentStatusFilter === 'good') {
-                    filteredServers = block.servers.filter(s => !s.isDown && s.percentage >= 70);
-                } else if (currentStatusFilter === 'bad') {
-                    filteredServers = block.servers.filter(s => s.isDown || (!s.isDown && s.percentage < 60));
-                }
-                
-                filteredServers.forEach(server => {
-                    allNames.push(server.name);
-                });
-            });
-            
-            if (allNames.length === 0) {
-                showToast('No servers match the filters', 2000, true);
-                return;
-            }
-            
-            const namesText = allNames.join('\n');
-            
-            navigator.clipboard.writeText(namesText).then(() => {
-                showToast(`${allNames.length} server names copied!`);
-                
-                const btn = event.target;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                btn.classList.add('success');
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('success');
-                }, 2000);
-            }).catch(() => {
-                showToast('Failed to copy', 2000, true);
-            });
-        }
-
-        window.copyBlockNames = function(datetime, ip, event) {
-            const block = blocks.find(b => b.datetime === datetime && b.byIP === ip);
-            
-            if (!block) {
-                showToast('Block not found', 2000, true);
-                return;
-            }
-            
-            let filteredServers = block.servers;
-            if (currentStatusFilter === 'good') {
-                filteredServers = block.servers.filter(s => !s.isDown && s.percentage >= 70);
-            } else if (currentStatusFilter === 'bad') {
-                filteredServers = block.servers.filter(s => s.isDown || (!s.isDown && s.percentage < 60));
-            }
-            
-            const names = filteredServers.map(s => s.name);
-            
-            if (names.length === 0) {
-                showToast('No servers in this block', 2000, true);
-                return;
-            }
-            
-            const namesText = names.join('\n');
-            
-            navigator.clipboard.writeText(namesText).then(() => {
-                const btn = event.target;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                btn.classList.add('success');
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('success');
-                }, 2000);
-                
-                showToast(`${names.length} server names copied!`);
-            }).catch(() => {
-                showToast('Failed to copy', 2000, true);
-            });
-        };
-
-        // ==================== TOOL 2: DOMAIN/IP EXPLORER (UPDATED) ====================
-        (function() {
-            const rawArea = document.getElementById('rawInput');
-            const domainPillsContainer = document.getElementById('domainPillsContainer');
-            const ipPillsContainer = document.getElementById('ipPillsContainer');
-            const resetDomainBtn = document.getElementById('resetDomainSelection');
-            const resetIPBtn = document.getElementById('resetSelection');
-            const fullResetBtn = document.getElementById('resetIPExplorerBtn');
-            const resultsContainer = document.getElementById('resultsContainer');
-            const selectedFilterLabel = document.getElementById('selectedFilterLabel');
-            const serverCountDisplay = document.getElementById('serverCountDisplay');
-            const blockCountSpan = document.getElementById('blockCount');
-            const downloadBtn = document.getElementById('downloadTableBtn');
-
-            let allBlocks = [];
-            let uniqueIPs = [];
-            let uniqueDomains = [];
-            let currentFilterType = null; // 'ip' or 'domain'
-            let currentFilterValue = null;
-
-            function parseBlocks(text) {
-                const blocks = [];
-                
-                const rawBlocks = text.split(/(?=Message Send bot|TEAM:|(?<=\n|^)\d+\s+BY\s+IP)/g);
-                
-                for (let block of rawBlocks) {
-                    block = block.trim();
-                    if (!block || block.length < 5) continue;
-
-                    let timestamp = 'unknown time';
-                    
-                    const msgTimestampMatch = block.match(/Message Send bot,\s*\[(.*?)\]/);
-                    if (msgTimestampMatch) {
-                        timestamp = msgTimestampMatch[1];
-                    } else {
-                        const timeMatch = block.match(/(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2})|(\d{2}\/\d{2}\/\d{4})|(\d{2}:\d{2}:\d{2})|(\d{2}:\d{2})/);
-                        if (timeMatch) {
-                            timestamp = timeMatch[0];
-                        }
-                    }
-
-                    let byIP = null;
-                    
-                    const byIPMatch = block.match(/By IP:\s*([\d,]+(?:\.\d+)?)/);
-                    if (byIPMatch) {
-                        byIP = parseFloat(byIPMatch[1].replace(/,/g, ''));
-                    } else {
-                        const byIpTitleMatch = block.match(/^(\d+)\s+BY\s+IP/im);
-                        if (byIpTitleMatch) {
-                            byIP = parseFloat(byIpTitleMatch[1]);
-                        }
-                    }
-
-                    // Extract domain from RP: or DOO:
-                    let domain = null;
-                    const lines = block.split('\n');
-                    for (let line of lines) {
-                        line = line.trim();
-                        
-                        // Check RP: first
-                        const rpMatch = line.match(/RP:\s*([^\s]+)/);
-                        if (rpMatch && rpMatch[1] && !rpMatch[1].includes('[RDNS]')) {
-                            domain = rpMatch[1];
-                            break;
-                        }
-                        
-                        // If no RP, check DOO:
-                        const dooMatch = line.match(/DOO:\s*([^\s]+)/);
-                        if (dooMatch && dooMatch[1] && !dooMatch[1].includes('[RDNS]') && !domain) {
-                            domain = dooMatch[1];
-                        }
-                    }
-                    
-                    if (!byIP || isNaN(byIP)) continue;
-
-                    const blockServers = [];
-                    
-                    const serverLines = block.match(/^🟢\s+([a-zA-Z0-9_]+):/gm);
-                    if (serverLines) {
-                        for (let line of serverLines) {
-                            const match = line.match(/🟢\s+([a-zA-Z0-9_]+):/);
-                            if (match && match[1]) blockServers.push(match[1]);
-                        }
-                    }
-                    
-                    const downServerLines = block.match(/💥\s+([^:]+)/g);
-                    if (downServerLines) {
-                        for (let line of downServerLines) {
-                            const match = line.match(/💥\s+([^:]+)/);
-                            if (match && match[1]) {
-                                const serverName = match[1].trim().split(':')[0];
-                                blockServers.push(serverName);
-                            }
-                        }
-                    }
-                    
-                    let inServerSection = false;
-                    for (let line of lines) {
-                        line = line.trim();
-                        if (line.match(/^\d+\s+BY\s+IP$/i)) {
-                            inServerSection = true;
-                            continue;
-                        }
-                        if (inServerSection && line.match(/^s[\d_]*cmh6[\d_]*/i)) {
-                            blockServers.push(line);
-                        } else if (inServerSection && line.length > 0 && !line.match(/^s/)) {
-                            inServerSection = false;
-                        }
-                    }
-
-                    if (blockServers.length === 0) {
-                        const genericMatches = block.match(/\b(s[\d_]*cmh6[\d_]*)\b/g);
-                        if (genericMatches) {
-                            genericMatches.forEach(s => {
-                                if (!blockServers.includes(s)) blockServers.push(s);
-                            });
-                        }
-                    }
-
-                    blocks.push({
-                        id: `block-${blocks.length}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                        byIP: byIP,
-                        domain: domain,
-                        servers: [...new Set(blockServers)],
-                        timestamp: timestamp,
-                        serverCount: blockServers.length
-                    });
-                }
-                
-                return blocks;
-            }
-
-            function refreshData() {
-                const rawText = rawArea.value;
-                allBlocks = parseBlocks(rawText);
-                
-                blockCountSpan.innerText = allBlocks.length + (allBlocks.length === 1 ? ' block' : ' blocks');
-
-                const ipSet = new Set(allBlocks.map(b => b.byIP));
-                uniqueIPs = Array.from(ipSet).sort((a, b) => a - b);
-                
-                const domainSet = new Set(allBlocks.map(b => b.domain).filter(d => d));
-                uniqueDomains = Array.from(domainSet).sort();
-
-                renderPills();
-
-                if (currentFilterType === 'ip' && !ipSet.has(currentFilterValue)) {
-                    currentFilterType = null;
-                    currentFilterValue = null;
-                }
-                if (currentFilterType === 'domain' && !domainSet.has(currentFilterValue)) {
-                    currentFilterType = null;
-                    currentFilterValue = null;
-                }
-
-                applyFilter();
-            }
-
-            function renderPills() {
-                // Render Domain Pills
-                if (uniqueDomains.length === 0) {
-                    domainPillsContainer.innerHTML = '<span style="color:#4f6b89; padding:6px;">(no domains detected)</span>';
-                } else {
-                    let domainHtml = '';
-                    uniqueDomains.forEach(domain => {
-                        const blocksWithDomain = allBlocks.filter(b => b.domain === domain);
-                        const totalServers = blocksWithDomain.reduce((acc, b) => acc + b.servers.length, 0);
-                        const blockCount = blocksWithDomain.length;
-                        const activeClass = (currentFilterType === 'domain' && currentFilterValue === domain) ? 'active' : '';
-                        domainHtml += `<div class="ip-pill ${activeClass}" onclick="selectDomain('${domain}')">
-                                    ${domain} <span class="server-count">${blockCount} blocks · ${totalServers} servers</span>
-                                 </div>`;
-                    });
-                    domainPillsContainer.innerHTML = domainHtml;
-                }
-
-                // Render IP Pills
-                if (uniqueIPs.length === 0) {
-                    ipPillsContainer.innerHTML = '<span style="color:#4f6b89; padding:6px;">(no IP limits detected)</span>';
-                } else {
-                    let ipHtml = '';
-                    uniqueIPs.forEach(ip => {
-                        const blocksWithIP = allBlocks.filter(b => b.byIP === ip);
-                        const totalServers = blocksWithIP.reduce((acc, b) => acc + b.servers.length, 0);
-                        const blockCount = blocksWithIP.length;
-                        const activeClass = (currentFilterType === 'ip' && currentFilterValue === ip) ? 'active' : '';
-                        ipHtml += `<div class="ip-pill ${activeClass}" onclick="selectIP(${ip})">
-                                    ${ip} <span class="server-count">${blockCount} blocks · ${totalServers} servers</span>
-                                 </div>`;
-                    });
-                    ipPillsContainer.innerHTML = ipHtml;
-                }
-            }
-
-            window.selectDomain = function(domain) {
-                currentFilterType = 'domain';
-                currentFilterValue = domain;
-                document.querySelectorAll('#domainPillsContainer .ip-pill').forEach(p => p.classList.remove('active'));
-                event.target.closest('.ip-pill').classList.add('active');
-                document.querySelectorAll('#ipPillsContainer .ip-pill').forEach(p => p.classList.remove('active'));
-                applyFilter();
-            };
-
-            window.selectIP = function(ip) {
-                currentFilterType = 'ip';
-                currentFilterValue = ip;
-                document.querySelectorAll('#ipPillsContainer .ip-pill').forEach(p => p.classList.remove('active'));
-                event.target.closest('.ip-pill').classList.add('active');
-                document.querySelectorAll('#domainPillsContainer .ip-pill').forEach(p => p.classList.remove('active'));
-                applyFilter();
-            };
-
-            function applyFilter() {
-                let filteredBlocks = [];
-                let filterLabel = '🌐 all groups';
-                
-                if (currentFilterType === 'ip') {
-                    filteredBlocks = allBlocks.filter(b => b.byIP === currentFilterValue);
-                    filterLabel = `🔹 By IP = ${currentFilterValue}`;
-                } else if (currentFilterType === 'domain') {
-                    filteredBlocks = allBlocks.filter(b => b.domain === currentFilterValue);
-                    filterLabel = `🌐 By Domain = ${currentFilterValue}`;
-                } else {
-                    filteredBlocks = allBlocks;
-                }
-
-                selectedFilterLabel.innerText = filterLabel;
-
-                const totalServers = filteredBlocks.reduce((acc, b) => acc + b.servers.length, 0);
-                serverCountDisplay.innerText = totalServers + (totalServers === 1 ? ' server' : ' servers') + ' across ' + filteredBlocks.length + ' blocks';
-
-                if (filteredBlocks.length === 0) {
-                    resultsContainer.innerHTML = `<div class="placeholder-nodata">✨ No blocks match</div>`;
-                    return;
-                }
-
-                let html = '';
-                filteredBlocks.forEach((block, idx) => {
-                    const ip = block.byIP;
-                    const domain = block.domain || 'No domain';
-                    const servers = block.servers;
-                    const timestamp = block.timestamp;
-                    const serverCount = servers.length;
-                    const blockId = block.id || `block-${idx}-${Date.now()}`;
-
-                    let serversHtml = '';
-                    if (servers.length > 0) {
-                        serversHtml = servers.map(s => `<span class="server-chip">${s}</span>`).join('');
-                    } else {
-                        serversHtml = `<span class="no-servers-chip">⚠️ no server names</span>`;
-                    }
-
-                    html += `
-                        <div class="block-card">
-                            <div class="timestamp-header">
-                                <span class="timestamp-badge">⏱️ ${timestamp}</span>
-                                <span class="server-count-badge">📊 ${serverCount} servers</span>
-                            </div>
-                            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap;">
-                                <div class="byip-value" style="font-size: 1.5rem; background: #f59e0b20;">
-                                    <i class="fas fa-bullseye"></i> ${ip}
-                                </div>
-                                ${domain !== 'No domain' ? 
-                                    `<div class="byip-value" style="font-size: 1.5rem; background: #10b98120;">
-                                        <i class="fas fa-globe"></i> ${domain}
-                                    </div>` : 
-                                    `<div class="no-domain">No domain</div>`
-                                }
-                            </div>
-                            <div class="servers-in-card">
-                                ${serversHtml}
-                                ${servers.length > 0 ? `
-                                    <button class="copy-btn" onclick='copyServerNames("${blockId}", ${JSON.stringify(servers)})'>
-                                        <i class="fas fa-copy"></i> copy all
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                resultsContainer.innerHTML = html;
-            }
-
-            window.copyServerNames = function(blockId, servers) {
-                if (!servers || servers.length === 0) {
-                    showToast('⚠️ No servers to copy');
-                    return;
-                }
-                
-                const textToCopy = servers.join('\n');
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    showToast(`✅ Copied ${servers.length} server names`);
-                }).catch(err => {
-                    showToast('❌ Failed to copy');
-                });
-            };
-
-            function resetDomainFilter() {
-                if (currentFilterType === 'domain') {
-                    currentFilterType = null;
-                    currentFilterValue = null;
-                }
-                document.querySelectorAll('#domainPillsContainer .ip-pill').forEach(p => p.classList.remove('active'));
-                applyFilter();
-                showToast('🌐 Showing all domains');
-            }
-
-            function resetIPFilter() {
-                if (currentFilterType === 'ip') {
-                    currentFilterType = null;
-                    currentFilterValue = null;
-                }
-                document.querySelectorAll('#ipPillsContainer .ip-pill').forEach(p => p.classList.remove('active'));
-                applyFilter();
-                showToast('🌐 Showing all IPs');
-            }
-
-            function fullReset() {
-                rawArea.value = '';
-                allBlocks = [];
-                uniqueIPs = [];
-                uniqueDomains = [];
-                currentFilterType = null;
-                currentFilterValue = null;
-                
-                blockCountSpan.innerText = '0 blocks';
-                selectedFilterLabel.innerText = '🌐 all groups';
-                serverCountDisplay.innerText = '0 servers';
-                
-                renderPills();
-                resultsContainer.innerHTML = `<div class="placeholder-nodata">👆 paste data, then click any domain or IP pill</div>`;
-                
-                showToast('✨ Reset complete');
-            }
-
-            function downloadTable() {
-                let blocksToExport = [];
-                if (currentFilterType === 'ip') {
-                    blocksToExport = allBlocks.filter(b => b.byIP === currentFilterValue);
-                } else if (currentFilterType === 'domain') {
-                    blocksToExport = allBlocks.filter(b => b.domain === currentFilterValue);
-                } else {
-                    blocksToExport = allBlocks;
-                }
-
-                if (blocksToExport.length === 0) {
-                    showToast('No data to export');
-                    return;
-                }
-
-                const rows = [['timestamp', 'by_ip', 'domain', 'server']];
-                blocksToExport.forEach(block => {
-                    const ip = block.byIP;
-                    const domain = block.domain || '';
-                    const timestamp = block.timestamp;
-                    if (block.servers.length > 0) {
-                        block.servers.forEach(srv => {
-                            rows.push([timestamp, ip, domain, srv]);
-                        });
-                    } else {
-                        rows.push([timestamp, ip, domain, '']);
-                    }
-                });
-
-                let csvContent = rows.map(row => {
-                    return row.map(cell => {
-                        if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-                            return `"${cell.replace(/"/g, '""')}"`;
-                        }
-                        return cell;
-                    }).join(',');
-                }).join('\n');
-
-                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                const filterSuffix = currentFilterType ? `_${currentFilterType}_${currentFilterValue}` : '_all';
-                link.setAttribute('download', `domain_ip_blocks${filterSuffix}.csv`);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                
-                showToast('📥 CSV downloaded');
-            }
-
-            rawArea.addEventListener('input', refreshData);
-            resetDomainBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                resetDomainFilter();
-            });
-            resetIPBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                resetIPFilter();
-            });
-            fullResetBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                fullReset();
-            });
-            downloadBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                downloadTable();
-            });
-        })();
-
-        // ==================== TOOL 3: EMAIL ERROR PARSER ====================
-        let parsedData = {
-            errors: new Map(),
-            teams: new Map(),
-            ipToErrors: new Map(),
-            totalIPs: 0,
-            totalErrorTypes: 0,
-            totalTeams: 0
-        };
-
-        function isIPAddress(str) {
-            const ipPattern = /^(\d{1,3}\.){3}\d{1,3}$/;
-            return ipPattern.test(str);
-        }
-
-        window.parseErrors = function() {
-            const input = document.getElementById('inputText').value;
-            if (!input.trim()) {
-                showToast('Please paste some error log first', 2000, true);
-                return;
-            }
-
-            showLoading();
-            
-            parsedData = {
-                errors: new Map(),
-                teams: new Map(),
-                ipToErrors: new Map(),
-                totalIPs: 0,
-                totalErrorTypes: 0,
-                totalTeams: 0
-            };
-
-            const lines = input.split('\n');
-            let currentTeam = null;
-            let currentIPs = [];
-            let currentErrorTypes = [];
-            let inErrorSection = false;
-            
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                
-                if (!line) continue;
-                
-                const teamMatch = line.match(/TEAM:\s*(\w+)/);
-                if (teamMatch) {
-                    currentTeam = teamMatch[1];
-                    if (!parsedData.teams.has(currentTeam)) {
-                        parsedData.teams.set(currentTeam, new Map());
-                    }
-                    continue;
-                }
-                
-                if (line.includes('❗️Errors ❗️:')) {
-                    inErrorSection = true;
-                    currentIPs = [];
-                    currentErrorTypes = [];
-                    continue;
-                }
-                
-                if (inErrorSection) {
-                    if (isIPAddress(line)) {
-                        currentIPs.push(line);
-                        continue;
-                    }
-                    
-                    if (line.startsWith('⚠️')) {
-                        const errorType = line.substring(2).trim();
-                        currentErrorTypes.push(errorType);
-                        
-                        if (!parsedData.errors.has(errorType)) {
-                            parsedData.errors.set(errorType, {
-                                ips: new Set(),
-                                teams: new Set(),
-                                occurrences: 0
-                            });
-                        }
-                        
-                        if (currentTeam) {
-                            parsedData.errors.get(errorType).teams.add(currentTeam);
-                        }
-                        
-                        parsedData.errors.get(errorType).occurrences++;
-                        
-                        currentIPs.forEach(ip => {
-                            parsedData.errors.get(errorType).ips.add(ip);
-                            
-                            if (!parsedData.ipToErrors.has(ip)) {
-                                parsedData.ipToErrors.set(ip, new Set());
-                            }
-                            parsedData.ipToErrors.get(ip).add(errorType);
-                            
-                            if (currentTeam) {
-                                const teamErrors = parsedData.teams.get(currentTeam);
-                                if (!teamErrors.has(errorType)) {
-                                    teamErrors.set(errorType, new Set());
-                                }
-                                teamErrors.get(errorType).add(ip);
-                            }
-                        });
-                        
-                        continue;
-                    }
-                    
-                    if (line.includes('Total IPs:')) {
-                        inErrorSection = false;
-                        currentIPs = [];
-                        currentErrorTypes = [];
-                    }
-                }
-            }
-
-            parsedData.totalIPs = parsedData.ipToErrors.size;
-            parsedData.totalErrorTypes = parsedData.errors.size;
-            parsedData.totalTeams = parsedData.teams.size;
-
-            updateSummaryCards();
-            updateErrorTabs();
-            
-            hideLoading();
-            showSections();
-            
-            if (parsedData.totalErrorTypes > 0) {
-                showToast(`✅ Found ${parsedData.totalErrorTypes} error types, ${parsedData.totalIPs} IPs`);
-            } else {
-                showToast('No errors found in the log', 2000, true);
-            }
-        };
-
-        function updateSummaryCards() {
-            const container = document.getElementById('summaryCards');
-            container.style.display = 'grid';
-            
-            let totalOccurrences = 0;
-            for (let [_, errorData] of parsedData.errors) {
-                totalOccurrences += errorData.occurrences;
-            }
-            
-            container.innerHTML = `
-                <div class="summary-card">
-                    <div class="label">Error Types</div>
-                    <div class="value">${parsedData.totalErrorTypes}</div>
-                </div>
-                <div class="summary-card">
-                    <div class="label">Unique IPs</div>
-                    <div class="value">${parsedData.totalIPs}</div>
-                </div>
-                <div class="summary-card">
-                    <div class="label">Teams Affected</div>
-                    <div class="value">${parsedData.totalTeams}</div>
-                </div>
-                <div class="summary-card">
-                    <div class="label">Total Errors</div>
-                    <div class="value">${totalOccurrences}</div>
-                </div>
-            `;
-        }
-
-        function updateErrorTabs() {
-            const tabsContainer = document.getElementById('errorTabs');
-            tabsContainer.innerHTML = '';
-            
-            document.getElementById('errorCount').textContent = `${parsedData.totalErrorTypes} error${parsedData.totalErrorTypes !== 1 ? 's' : ''}`;
-            
-            if (parsedData.totalErrorTypes === 0) {
-                tabsContainer.innerHTML = '<div style="color: #6c757d; padding: 20px; text-align: center;">No errors detected</div>';
-                document.getElementById('errorContent').style.display = 'none';
-                return;
-            }
-            
-            const sortedErrors = Array.from(parsedData.errors.entries())
-                .sort((a, b) => b[1].ips.size - a[1].ips.size);
-            
-            for (let [errorType, data] of sortedErrors) {
-                const tab = document.createElement('div');
-                tab.className = 'error-tab';
-                tab.setAttribute('data-error', errorType);
-                tab.innerHTML = `
-                    ${errorType.length > 30 ? errorType.substring(0, 30) + '...' : errorType}
-                    <span class="count">${data.ips.size}</span>
-                `;
-                tab.onclick = () => showErrorDetails(errorType);
-                tabsContainer.appendChild(tab);
-            }
-            
-            if (sortedErrors.length > 0) {
-                showErrorDetails(sortedErrors[0][0]);
-            }
-        }
-
-        window.copyErrorIPs = function(errorType) {
-            if (!errorType) {
-                showToast('Please select an error type first', 2000, true);
-                return;
-            }
-
-            const errorData = parsedData.errors.get(errorType);
-            if (!errorData || errorData.ips.size === 0) {
-                showToast('No IPs to copy', 2000, true);
-                return;
-            }
-
-            const sortedIPs = Array.from(errorData.ips).sort();
-            const textToCopy = sortedIPs.join('\n');
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast(`✅ Copied ${sortedIPs.length} IPs to clipboard`);
-            }).catch(err => {
-                showToast('❌ Failed to copy IPs', 2000, true);
-            });
-        };
-
-        function showErrorDetails(errorType) {
-            const errorData = parsedData.errors.get(errorType);
-            if (!errorData) return;
-
-            document.querySelectorAll('.error-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.getAttribute('data-error') === errorType) {
-                    tab.classList.add('active');
-                }
-            });
-
-            document.getElementById('errorContent').style.display = 'block';
-
-            let ipListHtml = '';
-            const sortedIPs = Array.from(errorData.ips).sort();
-            
-            for (let ip of sortedIPs) {
-                const teamsWithIP = [];
-                for (let [team, teamErrors] of parsedData.teams) {
-                    if (teamErrors.has(errorType) && teamErrors.get(errorType).has(ip)) {
-                        teamsWithIP.push(team);
-                    }
-                }
-                
-                const allErrorsForIP = parsedData.ipToErrors.get(ip) || new Set();
-                const otherErrors = Array.from(allErrorsForIP)
-                    .filter(e => e !== errorType)
-                    .join(', ');
-                
-                ipListHtml += `
-                    <div class="ip-item">
-                        <span class="ip-address">${ip}</span>
-                        <div class="ip-teams">
-                            ${teamsWithIP.map(team => `<span class="team-badge">Team ${team}</span>`).join('')}
-                            ${otherErrors ? `<span class="team-badge" style="background: #e9ecef; color: #495057;" title="Also has: ${otherErrors}">also has other errors</span>` : ''}
-                        </div>
-                    </div>
-                `;
-            }
-
-            const content = document.getElementById('errorContent');
-            content.innerHTML = `
-                <div class="error-stats">
-                    <div class="error-stats-grid">
-                        <div class="error-stat-item">
-                            <div class="error-stat-label">Error Type</div>
-                            <div class="error-stat-value">${errorType}</div>
-                        </div>
-                        <div class="error-stat-item">
-                            <div class="error-stat-label">Total IPs</div>
-                            <div class="error-stat-value">${errorData.ips.size}</div>
-                        </div>
-                        <div class="error-stat-item">
-                            <div class="error-stat-label">Occurrences</div>
-                            <div class="error-stat-value">${errorData.occurrences}</div>
-                        </div>
-                        <div class="error-stat-item">
-                            <div class="error-stat-label">Teams</div>
-                            <div class="error-stat-value">${errorData.teams.size}</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="ip-list">
-                    <div class="ip-list-header">
-                        <span>IP Addresses (${errorData.ips.size} total)</span>
-                        <button class="copy-ips-btn" onclick="copyErrorIPs('${errorType.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-copy"></i> Copy All IPs
-                        </button>
-                    </div>
-                    ${ipListHtml || '<div class="no-data">No IPs found for this error type</div>'}
-                </div>
-            `;
-        }
-
-        window.resetEmailParser = function() {
-            document.getElementById('inputText').value = '';
-            
-            parsedData = {
-                errors: new Map(),
-                teams: new Map(),
-                ipToErrors: new Map(),
-                totalIPs: 0,
-                totalErrorTypes: 0,
-                totalTeams: 0
-            };
-
-            document.getElementById('summaryCards').style.display = 'none';
-            document.getElementById('errorSelector').style.display = 'none';
-            document.getElementById('errorTabs').innerHTML = '';
-            document.getElementById('errorContent').style.display = 'none';
-            document.getElementById('errorCount').textContent = '0 errors';
-            
-            showToast('Email Parser - cleared');
-        };
-
-        function showLoading() {
-            document.getElementById('loading').style.display = 'block';
-        }
-
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        function showSections() {
-            document.getElementById('summaryCards').style.display = 'grid';
-            document.getElementById('errorSelector').style.display = 'block';
-        }
-    </script>
 </body>
 </html>
