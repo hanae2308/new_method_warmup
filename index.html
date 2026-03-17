@@ -243,6 +243,12 @@ input[type=date]:focus{border-color:var(--accent);}
 .insights-empty{text-align:center;padding:60px 20px;color:var(--text3);}
 .insights-empty .ico{font-size:2.5rem;margin-bottom:12px;opacity:.35;}
 .insights-empty p{font-size:0.85rem;}
+.insights-range-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 18px;box-shadow:var(--shadow-sm);flex-wrap:wrap;}
+.insights-range-label{font-size:0.7rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text2);margin-right:4px;}
+.insights-range-btn{background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;padding:5px 14px;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;}
+.insights-range-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.insights-range-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(79,110,247,.25);}
+.insights-range-info{margin-left:auto;font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;}
 
 .perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px;}
 .perf-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
@@ -516,6 +522,17 @@ Ctrl+Enter to parse"></textarea>
 
   <!-- ★ Sub-panel: Insights -->
   <div class="prog-subpanel" id="subpanel-insights">
+    <div id="insightsRangeBar" style="display:none">
+      <div class="insights-range-bar">
+        <span class="insights-range-label">📅 Date Range</span>
+        <button class="insights-range-btn" onclick="setInsightRange(5,this)">Last 5 Days</button>
+        <button class="insights-range-btn" onclick="setInsightRange(7,this)">Last 7 Days</button>
+        <button class="insights-range-btn" onclick="setInsightRange(10,this)">Last 10 Days</button>
+        <button class="insights-range-btn" onclick="setInsightRange(14,this)">Last 14 Days</button>
+        <button class="insights-range-btn active" onclick="setInsightRange(0,this)">All Dates</button>
+        <span class="insights-range-info" id="insightsRangeInfo"></span>
+      </div>
+    </div>
     <div id="insightsContent">
       <div class="insights-empty"><div class="ico">🔬</div><p>Analyse data first to see insights</p></div>
     </div>
@@ -666,10 +683,18 @@ function badgeCls(l){return BADGE_CLASS[String(l).toLowerCase()]||'lv-1k';}
 let allDates=[],serverMap={},activeFilter='all',selectedServers=new Set(),pickerBodyOpen=true;
 function normDate(raw){
   raw=raw.trim();
-  let m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m)return`${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
-  m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  // YYYY-MM-DD
+  let m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if(m)return raw;
+  // D/M/YYYY or DD/MM/YYYY or M/D/YYYY or MM/DD/YYYY
+  m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m){
+    const a=parseInt(m[1]),b=parseInt(m[2]),y=m[3];
+    if(a>12)return`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+    if(b>12)return`${y}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+    // Both <=12: ambiguous — assume DD/MM/YYYY
+    return`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  }
   return null;
 }
 function fmtDate(iso){const[y,mo,d]=iso.split('-');return`${parseInt(d)}/${parseInt(mo)}`;}
@@ -695,9 +720,27 @@ function analyseProgress(){
     if(!date||!server||!level||server==='Server')continue;
     dateSet.add(date);
     if(!serverMap[server])serverMap[server]={};
-    serverMap[server][date]=level;
+    const existing=serverMap[server][date];
+    if(!existing||lvRank(level)>lvRank(existing)){serverMap[server][date]=level;}
   }
   allDates=[...dateSet].sort();
+  // Remove date outliers caused by ambiguous date format parsing (e.g. 03/02/2026 parsed as Feb 3 instead of Mar 2)
+  if(allDates.length>3){
+    const toOrd=iso=>{const[y,m,d]=iso.split('-').map(Number);return y*365+m*30+d;};
+    const ords=allDates.map(toOrd);
+    const sorted=[...ords].sort((a,b)=>a-b);
+    const mid=sorted[Math.floor(sorted.length/2)];
+    const mean=ords.reduce((a,b)=>a+b,0)/ords.length;
+    const std=Math.sqrt(ords.reduce((s,v)=>s+(v-mean)**2,0)/ords.length);
+    allDates=allDates.filter((_,i)=>Math.abs(ords[i]-mid)<=2*std);
+    // Clean serverMap: remove entries for filtered-out dates
+    const validDateSet=new Set(allDates);
+    for(const srv of Object.keys(serverMap)){
+      for(const d of Object.keys(serverMap[srv])){
+        if(!validDateSet.has(d))delete serverMap[srv][d];
+      }
+    }
+  }
   if(!allDates.length||!Object.keys(serverMap).length){alert('No valid data found.');return;}
   selectedServers=new Set();
   document.getElementById('progFilters').style.display='flex';
@@ -747,19 +790,44 @@ function isMixed(s){
   return ups>0&&dns>0;
 }
 
+// ★ NEW: Insights date range state
+let insightDays=0; // 0 = all
+function setInsightRange(n,btn){
+  insightDays=n;
+  document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderInsights();
+}
+function getInsightDates(){
+  if(!insightDays||insightDays>=allDates.length)return allDates;
+  return allDates.slice(-insightDays);
+}
+
 // ★ NEW: Insights renderer
 function renderInsights(){
   const servers=Object.keys(serverMap);
+  const useDates=getInsightDates();
 
-  // 1. Never inboxed — spam on every single recorded date
+  // Update info label
+  const infoEl=document.getElementById('insightsRangeInfo');
+  if(infoEl){
+    if(useDates.length===allDates.length)infoEl.textContent=`Showing all ${allDates.length} dates`;
+    else infoEl.textContent=`Showing ${useDates.length} of ${allDates.length} dates`;
+  }
+
+  // Show the range bar
+  const rangeBar=document.getElementById('insightsRangeBar');
+  if(rangeBar)rangeBar.style.display='block';
+
+  // 1. Never inboxed — spam on every day in the selected window (must appear on ALL days as spam)
   const neverInboxed=servers.filter(s=>{
-    const vals=allDates.map(d=>serverMap[s][d]).filter(Boolean);
-    return vals.length>0&&vals.every(v=>v==='spam');
+    // Must have an entry on every date in the window, and every entry must be spam
+    return useDates.length>0&&useDates.every(d=>serverMap[s][d]==='spam');
   });
 
   // 2. Consistently improving — every step is up or flat, at least one real up
   const steadyUp=servers.filter(s=>{
-    const vals=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
+    const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
     if(vals.length<2)return false;
     let hasUp=false;
     for(let i=1;i<vals.length;i++){
@@ -772,7 +840,7 @@ function renderInsights(){
 
   // 3. Peaked then dropped — reached max before last entry, then went down
   const peaked=servers.filter(s=>{
-    const vals=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
+    const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
     if(vals.length<3)return false;
     const ranks=vals.map(lvRank);
     const maxIdx=ranks.indexOf(Math.max(...ranks));
@@ -781,21 +849,27 @@ function renderInsights(){
   });
 
   // 4. Unstable / bouncing — goes both up AND down (mixed), but not peaked
-  const unstable=servers.filter(s=>isMixed(s)&&!peaked.includes(s));
+  const unstable=servers.filter(s=>{
+    const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
+    if(vals.length<2)return false;
+    let ups=0,dns=0;
+    for(let i=1;i<vals.length;i++){const d=lvRank(vals[i])-lvRank(vals[i-1]);if(d>0)ups++;else if(d<0)dns++;}
+    return ups>0&&dns>0&&!peaked.includes(s);
+  });
 
   // 5. Spam by day map
   const spamByDay={};
-  allDates.forEach(d=>{spamByDay[d]=servers.filter(s=>serverMap[s][d]==='spam');});
+  useDates.forEach(d=>{spamByDay[d]=servers.filter(s=>serverMap[s][d]==='spam');});
 
   const cats=[
-    {key:'never',icon:'🚫',title:'Never Reached Inbox',desc:'Spam on every single recorded date',servers:neverInboxed,
-     getBadge:s=>{const n=allDates.filter(d=>serverMap[s][d]==='spam').length;return{text:'spam all '+n+' days',bg:'#fee2e2',fg:'#991b1b'};}},
+    {key:'never',icon:'🚫',title:'Never Reached Inbox',desc:'Spam on every day in the selected date range',servers:neverInboxed,
+     getBadge:s=>{const n=useDates.filter(d=>serverMap[s][d]==='spam').length;return{text:'spam '+n+'/'+useDates.length+' days',bg:'#fee2e2',fg:'#991b1b'};}},
     {key:'steady',icon:'📈',title:'Consistently Improving',desc:'Level went up every single recorded day',servers:steadyUp,
-     getBadge:s=>{const v=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');return{text:v[0]+' → '+v[v.length-1],bg:'#d1fae5',fg:'#065f46'};}},
+     getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');return{text:v[0]+' → '+v[v.length-1],bg:'#d1fae5',fg:'#065f46'};}},
     {key:'peaked',icon:'📉',title:'Peaked & Dropped',desc:'Hit a high level then fell back down',servers:peaked,
-     getBadge:s=>{const v=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');const r=v.map(lvRank);const pk=v[r.indexOf(Math.max(...r))];return{text:'peak:'+pk+' → '+v[v.length-1],bg:'#fef3c7',fg:'#92400e'};}},
+     getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');const r=v.map(lvRank);const pk=v[r.indexOf(Math.max(...r))];return{text:'peak:'+pk+' → '+v[v.length-1],bg:'#fef3c7',fg:'#92400e'};}},
     {key:'unstable',icon:'↕️',title:'Unstable / Bouncing',desc:'Level jumping up and down inconsistently',servers:unstable,
-     getBadge:s=>{const v=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');let u=0,dn=0;for(let i=1;i<v.length;i++){const d=lvRank(v[i])-lvRank(v[i-1]);if(d>0)u++;else if(d<0)dn++;}return{text:'↑'+u+' ↓'+dn,bg:'#ede9fe',fg:'#6d28d9'};}}
+     getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');let u=0,dn=0;for(let i=1;i<v.length;i++){const d=lvRank(v[i])-lvRank(v[i-1]);if(d>0)u++;else if(d<0)dn++;}return{text:'↑'+u+' ↓'+dn,bg:'#ede9fe',fg:'#6d28d9'};}}
   ];
 
   let html='<div class="insights-grid">';
@@ -827,7 +901,7 @@ function renderInsights(){
   // Spam by Day section
   const total=servers.length;
   html+='<div class="spam-by-day-section"><div class="spam-byday-head"><span class="spam-byday-icon">📅</span><div class="spam-byday-text"><div class="spam-byday-title">Spam Per Day</div><div class="spam-byday-sub">Which servers were spam on each date — spot problem patterns</div></div></div><div class="spam-days-wrap">';
-  allDates.forEach((d,i)=>{
+  useDates.forEach((d,i)=>{
     const sp=spamByDay[d]||[];
     const pct=total>0?((sp.length/total)*100).toFixed(0):0;
     html+=`<div class="spam-day-block">
@@ -941,6 +1015,10 @@ function resetProgress(){
   document.getElementById('progSubtabs').style.display='none'; // ★ hide sub-tabs
   document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Analyse</p></div>`;
   document.getElementById('insightsContent').innerHTML=`<div class="insights-empty"><div class="ico">🔬</div><p>Analyse data first to see insights</p></div>`; // ★ reset insights
+  document.getElementById('insightsRangeBar').style.display='none';
+  insightDays=0;
+  document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));
+  const allBtn=document.querySelector('.insights-range-btn:last-of-type');if(allBtn)allBtn.classList.add('active');
   serverMap={};allDates=[];selectedServers=new Set();
   // reset sub-tab back to table
   document.querySelectorAll('.prog-subtab').forEach((b,i)=>b.classList.toggle('active',i===0));
