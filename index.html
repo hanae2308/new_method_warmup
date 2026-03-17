@@ -249,6 +249,14 @@ input[type=date]:focus{border-color:var(--accent);}
 .insights-range-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
 .insights-range-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(79,110,247,.25);}
 .insights-range-info{margin-left:auto;font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.insights-scope-toggle{display:flex;align-items:center;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;margin-left:8px;}
+.insights-scope-btn{background:transparent;border:none;padding:5px 14px;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.insights-scope-btn:hover{color:var(--accent);}
+.insights-scope-btn.active{background:var(--accent);color:#fff;border-radius:20px;}
+.insights-scope-toggle{display:flex;align-items:center;gap:0;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;margin-left:12px;}
+.insights-scope-btn{padding:5px 14px;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:600;color:var(--text2);background:transparent;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.insights-scope-btn:hover{color:var(--accent);}
+.insights-scope-btn.active{background:var(--accent);color:#fff;}
 
 .perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px;}
 .perf-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
@@ -531,6 +539,10 @@ Ctrl+Enter to parse"></textarea>
         <button class="insights-range-btn" onclick="setInsightRange(14,this)">Last 14 Days</button>
         <button class="insights-range-btn active" onclick="setInsightRange(0,this)">All Dates</button>
         <span class="insights-range-info" id="insightsRangeInfo"></span>
+        <div class="insights-scope-toggle">
+          <button class="insights-scope-btn active" id="scopeBtnAll" onclick="setInsightScope('all',this)">📊 All Servers</button>
+          <button class="insights-scope-btn" id="scopeBtnManaged" onclick="setInsightScope('managed',this)">⭐ Managed Only</button>
+        </div>
       </div>
     </div>
     <div id="insightsContent">
@@ -792,6 +804,21 @@ function isMixed(s){
 
 // ★ NEW: Insights date range state
 let insightDays=0; // 0 = all
+let insightScope='all'; // 'all' or 'managed'
+function setInsightScope(scope,btn){
+  insightScope=scope;
+  document.querySelectorAll('.insights-scope-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderInsights();
+}
+function getInsightServers(allServers){
+  if(insightScope==='managed'){
+    const managed=new Set(lsLoad());
+    const filtered=allServers.filter(s=>managed.has(s));
+    return filtered.length>0?filtered:allServers; // fallback to all if none match
+  }
+  return allServers;
+}
 function setInsightRange(n,btn){
   insightDays=n;
   document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));
@@ -805,14 +832,19 @@ function getInsightDates(){
 
 // ★ NEW: Insights renderer
 function renderInsights(){
-  const servers=Object.keys(serverMap);
+  const allServers=Object.keys(serverMap);
+  const managed=new Set(lsLoad());
+  const servers=insightScope==='managed'&&managed.size>0
+    ? allServers.filter(s=>managed.has(s))
+    : allServers;
   const useDates=getInsightDates();
 
   // Update info label
   const infoEl=document.getElementById('insightsRangeInfo');
   if(infoEl){
-    if(useDates.length===allDates.length)infoEl.textContent=`Showing all ${allDates.length} dates`;
-    else infoEl.textContent=`Showing ${useDates.length} of ${allDates.length} dates`;
+    const dateStr=useDates.length===allDates.length?`all ${allDates.length} dates`:`${useDates.length}/${allDates.length} dates`;
+    const scopeStr=insightScope==='managed'&&managed.size>0?` · ${servers.length} managed servers`:` · ${servers.length} servers`;
+    infoEl.textContent=dateStr+scopeStr;
   }
 
   // Show the range bar
@@ -1016,9 +1048,12 @@ function resetProgress(){
   document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Analyse</p></div>`;
   document.getElementById('insightsContent').innerHTML=`<div class="insights-empty"><div class="ico">🔬</div><p>Analyse data first to see insights</p></div>`; // ★ reset insights
   document.getElementById('insightsRangeBar').style.display='none';
-  insightDays=0;
+  insightDays=0;insightScope='all';
   document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));
   const allBtn=document.querySelector('.insights-range-btn:last-of-type');if(allBtn)allBtn.classList.add('active');
+  document.getElementById('scopeBtnAll')?.classList.add('active');
+  document.getElementById('scopeBtnManaged')?.classList.remove('active');
+  document.querySelectorAll('.insights-scope-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
   serverMap={};allDates=[];selectedServers=new Set();
   // reset sub-tab back to table
   document.querySelectorAll('.prog-subtab').forEach((b,i)=>b.classList.toggle('active',i===0));
