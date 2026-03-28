@@ -4,7 +4,6 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Server Tools</title>
-<!-- Favicon with letter W -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234f6ef7'/%3E%3Ctext x='50' y='70' font-size='70' text-anchor='middle' fill='white' font-family='Outfit, Arial, sans-serif' font-weight='600'%3EW%3C/text%3E%3C/svg%3E">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -17,6 +16,7 @@
   --green:#059669;--green-dim:#d1fae5;
   --red:#ef4444;--red-dim:#fee2e2;
   --orange:#d97706;--orange-dim:#fef3c7;
+  --purple:#7c3aed;--purple-dim:#ede9fe;
   --gray-dim:#f1f5f9;
   --shadow-sm:0 1px 2px rgba(0,0,0,.05);
   --shadow:0 2px 8px rgba(0,0,0,.08);
@@ -189,8 +189,6 @@ input[type=date]:focus{border-color:var(--accent);}
 .ibt.del:hover{background:#fee2e2;}
 .empty-srv{text-align:center;color:var(--text2);font-size:0.75rem;padding:24px 0;font-family:'JetBrains Mono',monospace;}
 .drawer-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:8px;}
-
-/* ── PROGRESS SUB-TABS ── */
 .prog-subtabs{display:flex;gap:0;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
 .prog-subtab{flex:1;padding:13px 18px;font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:600;color:var(--text2);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
 .prog-subtab:hover{color:var(--accent);background:var(--accent-dim);}
@@ -251,19 +249,14 @@ input[type=date]:focus{border-color:var(--accent);}
 .insights-range-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
 .insights-range-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(79,110,247,.25);}
 .insights-range-info{margin-left:auto;font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;}
-.insights-scope-toggle{display:flex;align-items:center;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;margin-left:8px;}
-.insights-scope-btn{background:transparent;border:none;padding:5px 14px;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;}
-.insights-scope-btn:hover{color:var(--accent);}
-.insights-scope-btn.active{background:var(--accent);color:#fff;border-radius:20px;}
 .insights-scope-toggle{display:flex;align-items:center;gap:0;background:var(--surface2);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;margin-left:12px;}
 .insights-scope-btn{padding:5px 14px;font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:600;color:var(--text2);background:transparent;border:none;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .insights-scope-btn:hover{color:var(--accent);}
 .insights-scope-btn.active{background:var(--accent);color:#fff;}
-
 .perf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px;}
 .perf-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);}
 .perf-block-head{background:var(--surface2);padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.perf-time{background:var(--accent);color:#fff;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
+.perf-time{background:#3b82f6;color:#fff;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
 .perf-byip{background:var(--orange-dim);color:var(--orange);border:1px solid #fde68a;border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;font-family:'JetBrains Mono',monospace;}
 .perf-team{background:var(--accent-dim);color:var(--accent);border-radius:20px;padding:3px 10px;font-size:0.7rem;font-weight:600;}
 .perf-profile{color:var(--text3);font-size:0.68rem;font-family:'JetBrains Mono',monospace;margin-left:auto;}
@@ -360,6 +353,8 @@ input[type=date]:focus{border-color:var(--accent);}
 .pf-sbtn:hover{background:#f1f5f9;}.pf-sbtn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
 .pf-ipbtn{padding:5px 12px;border:1.5px solid #f59e0b;border-radius:20px;background:#fffbeb;color:#b45309;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all .15s;}
 .pf-ipbtn:hover{background:#fef3c7;}.pf-ipbtn.active{background:#f59e0b;color:#fff;border-color:#f59e0b;}
+.pf-dombtn{padding:5px 12px;border:1.5px solid #c4b5fd;border-radius:20px;background:#ede9fe;color:#6d28d9;font-size:0.75rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace;}
+.pf-dombtn:hover{background:#ddd6fe;}.pf-dombtn.active{background:#7c3aed;color:#fff;border-color:#7c3aed;}
 .pf-copy-all{margin-left:auto;display:flex;align-items:center;gap:6px;padding:7px 15px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:0.78rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s;}
 .pf-copy-all:hover{border-color:var(--green);color:var(--green);}
 .pf-blocks{display:flex;flex-direction:column;gap:22px;}
@@ -367,6 +362,8 @@ input[type=date]:focus{border-color:var(--accent);}
 .pf-block-head{background:#f8fafc;padding:12px 20px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .pf-btime{background:#3b82f6;color:#fff;border-radius:20px;padding:5px 13px;font-size:0.75rem;font-weight:600;display:flex;align-items:center;gap:5px;}
 .pf-bip{background:#f59e0b;color:#fff;border-radius:20px;padding:5px 13px;font-size:0.75rem;font-weight:700;}
+/* ── NEW: domain badge in block header ── */
+.pf-bdomain{background:var(--purple-dim);color:var(--purple);border:1px solid #c4b5fd;border-radius:20px;padding:5px 13px;font-size:0.75rem;font-weight:700;font-family:'JetBrains Mono',monospace;display:flex;align-items:center;gap:5px;}
 .pf-bnodomain{color:var(--text3);font-style:italic;font-size:0.8rem;}
 .pf-bcopy{margin-left:auto;display:flex;align-items:center;gap:5px;padding:5px 13px;border:1.5px solid var(--border);border-radius:8px;background:#fff;font-size:0.75rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .15s;}
 .pf-bcopy:hover{border-color:var(--accent);color:var(--accent);}
@@ -435,6 +432,7 @@ input[type=date]:focus{border-color:var(--accent);}
   <button class="tab-btn" onclick="switchTab('perf',this)"><span class="tab-icon">📊</span>Server Performance</button>
 </div>
 
+<!-- ══ SORTER PANEL ══ -->
 <div class="panel active" id="panel-sorter">
 <div class="main">
   <div class="two-col">
@@ -469,9 +467,9 @@ Ctrl+Enter to parse"></textarea>
 </div>
 </div>
 
+<!-- ══ PROGRESS PANEL ══ -->
 <div class="panel" id="panel-progress">
 <div class="main">
-
   <div class="card" style="margin-bottom:20px">
     <div class="card-head"><div class="card-title">Paste Data</div></div>
     <div class="hint-text">Paste your <strong>All Data</strong> export (tab-separated: Date, Server, Level, Level_Num). Multiple dates are supported.</div>
@@ -485,16 +483,11 @@ Ctrl+Enter to parse"></textarea>
       </div>
     </div>
   </div>
-
   <div class="summary-bar" id="progSummary" style="display:none"></div>
-
-  <!-- ★ NEW: Sub-tab switcher -->
   <div class="prog-subtabs" id="progSubtabs" style="display:none">
     <button class="prog-subtab active" onclick="switchProgSubtab('table',this)">📋 Progress Table</button>
     <button class="prog-subtab" onclick="switchProgSubtab('insights',this)">🔬 Insights</button>
   </div>
-
-  <!-- ★ Sub-panel: original table view -->
   <div class="prog-subpanel active" id="subpanel-table">
     <div class="filters" id="progFilters" style="display:none">
       <span class="filter-label">Show:</span>
@@ -504,7 +497,6 @@ Ctrl+Enter to parse"></textarea>
       <button class="filter-btn" onclick="setPFilter('spam',this)">🚫 Has Spam</button>
       <button class="filter-btn" onclick="setPFilter('stable',this)">➡ Stable</button>
     </div>
-
     <div class="picker-panel" id="pickerPanel" style="display:none">
       <div class="picker-header" onclick="togglePickerBody()">
         <div class="picker-header-left">
@@ -524,13 +516,10 @@ Ctrl+Enter to parse"></textarea>
         <div class="picker-grid" id="pickerGrid"></div>
       </div>
     </div>
-
     <div class="table-card" id="progTable">
       <div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Analyse</p></div>
     </div>
   </div>
-
-  <!-- ★ Sub-panel: Insights -->
   <div class="prog-subpanel" id="subpanel-insights">
     <div id="insightsRangeBar" style="display:none">
       <div class="insights-range-bar">
@@ -551,28 +540,91 @@ Ctrl+Enter to parse"></textarea>
       <div class="insights-empty"><div class="ico">🔬</div><p>Analyse data first to see insights</p></div>
     </div>
   </div>
+</div>
+</div>
 
+<!-- ══ PERFORMANCE PANEL ══ -->
+<div class="panel" id="panel-perf">
+<div class="main">
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-head"><div class="card-title">Input Data</div></div>
+    <div class="hint-text">Paste performance reports. Blocks auto-detected by <strong>TEAM:</strong> or <strong>📅</strong> timestamp lines. Domain auto-detected from <strong>🔗 RPath:</strong>.</div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
+      <textarea id="perfInput" style="height:180px" placeholder="TEAM: C | 24K
+📅 18/02 00:04:05
+By IP: 18,000
+🟢 s_cmh6_5787: 90139 1188
+🟢 s_cmh6_5897: 36128 11
+🔗 RPath: globallean.net
+✉️ From: [RDNS]"></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="primary" onclick="parsePerf()">▶ Parse</button>
+        <button class="secondary" onclick="resetPerf()">↺</button>
+      </div>
+    </div>
+  </div>
+  <div class="sel-panel" id="selPanel" style="display:none">
+    <div class="sel-header" onclick="toggleSelPanel()">
+      <div class="sel-header-left">
+        <div class="sel-header-title">☰ Server Selector <span class="sel-count-badge" id="selTotalBadge">0 servers</span></div>
+      </div>
+      <span class="sel-chevron" id="selChevron">▼</span>
+    </div>
+    <div class="sel-body" id="selBody">
+      <div class="sel-top-row">
+        <div class="sel-stat-pill g" id="selGoodPill">● 0 Good</div>
+        <div class="sel-stat-pill w" id="selWarnPill">▲ 0 Warning</div>
+        <div class="sel-stat-pill b" id="selBadPill">● 0 Bad</div>
+        <div class="sel-search-wrap">
+          <input type="text" id="selSearchInput" placeholder="Search server name..." oninput="selDoSearch()"/>
+          <button class="sel-search-btn" onclick="selDoSearch()">🔍 Search</button>
+        </div>
+      </div>
+      <div class="sel-ftabs">
+        <div class="sel-ftab active" onclick="selSetStatus('all',this)">☰ All <span class="fcnt" id="selAllCnt">0</span></div>
+        <div class="sel-ftab" onclick="selSetStatus('g',this)">✓ Good <span class="fcnt" id="selGoodCnt">0</span></div>
+        <div class="sel-ftab" onclick="selSetStatus('w',this)">⚠ Warning <span class="fcnt" id="selWarnCnt">0</span></div>
+        <div class="sel-ftab" onclick="selSetStatus('b',this)">✕ Bad <span class="fcnt" id="selBadCnt">0</span></div>
+      </div>
+      <div class="sel-grid" id="selGrid"></div>
+      <div class="sel-tl" id="selTlPanel" style="display:none">
+        <div class="sel-tl-head">
+          <div class="sel-tl-name">☰ <span id="selTlName">–</span></div>
+          <span class="sel-tl-badge" id="selTlBadge">–</span>
+        </div>
+        <div class="sel-tl-rows" id="selTlRows"></div>
+      </div>
+    </div>
+  </div>
+  <div class="pf-filterbar" id="pfFilterBar" style="display:none">
+    <div class="pf-group">
+      <span class="pf-glabel">Status:</span>
+      <button class="pf-sbtn active" onclick="pfSetStatus('all',this)">ALL</button>
+      <button class="pf-sbtn" onclick="pfSetStatus('good',this)">GOOD (≥70%)</button>
+      <button class="pf-sbtn" onclick="pfSetStatus('bad',this)">BAD (Down or &lt;60%)</button>
+    </div>
+    <div class="pf-group" id="pfIPGroup"></div>
+    <div class="pf-group" id="pfDomainGroup"></div>
+    <button class="pf-copy-all" onclick="pfCopyAll()">📋 Copy Names</button>
+  </div>
+  <div class="pf-blocks" id="pfResults">
+    <div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Parse</p></div>
+  </div>
 </div>
 </div>
 
 <script>
 // ══════════════════════════════════════════════════════════════ SHARED
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-// ── LocalStorage server list
 const LS='srvSorter_v2';
 function lsLoad(){try{return JSON.parse(localStorage.getItem(LS))||[];}catch{return[];}}
 function lsSave(l){localStorage.setItem(LS,JSON.stringify(l));}
-
-// ── Tabs
 function switchTab(id,btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
 }
-
-// ── Drawer
 function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';}
 function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('overlay').classList.remove('open');document.body.style.overflow='';}
 function addOne(){const i=document.getElementById('newSrv'),n=i.value.trim();if(!n)return;const l=lsLoad();if(!l.includes(n)){l.push(n);lsSave(l);}i.value='';renderDrawer();}
@@ -697,30 +749,21 @@ function badgeCls(l){return BADGE_CLASS[String(l).toLowerCase()]||'lv-1k';}
 let allDates=[],serverMap={},activeFilter='all',selectedServers=new Set(),pickerBodyOpen=true;
 function normDate(raw){
   raw=raw.trim();
-  // YYYY-MM-DD
-  let m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if(m)return raw;
-  // D/M/YYYY or DD/MM/YYYY or M/D/YYYY or MM/DD/YYYY
+  let m=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)return raw;
   m=raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m){
-    const a=parseInt(m[1]),b=parseInt(m[2]),y=m[3];
+  if(m){const a=parseInt(m[1]),b=parseInt(m[2]),y=m[3];
     if(a>12)return`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
     if(b>12)return`${y}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
-    // Both <=12: ambiguous — assume DD/MM/YYYY
-    return`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-  }
+    return`${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}
   return null;
 }
 function fmtDate(iso){const[y,mo,d]=iso.split('-');return`${parseInt(d)}/${parseInt(mo)}`;}
-
-// ★ NEW: sub-tab switcher
 function switchProgSubtab(id,btn){
   document.querySelectorAll('.prog-subpanel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.prog-subtab').forEach(b=>b.classList.remove('active'));
   document.getElementById('subpanel-'+id).classList.add('active');
   btn.classList.add('active');
 }
-
 function analyseProgress(){
   const raw=document.getElementById('progInput').value.trim();if(!raw)return;
   const dateSet=new Set();serverMap={};
@@ -738,7 +781,6 @@ function analyseProgress(){
     if(!existing||lvRank(level)>lvRank(existing)){serverMap[server][date]=level;}
   }
   allDates=[...dateSet].sort();
-  // Remove date outliers caused by ambiguous date format parsing (e.g. 03/02/2026 parsed as Feb 3 instead of Mar 2)
   if(allDates.length>3){
     const toOrd=iso=>{const[y,m,d]=iso.split('-').map(Number);return y*365+m*30+d;};
     const ords=allDates.map(toOrd);
@@ -747,7 +789,6 @@ function analyseProgress(){
     const mean=ords.reduce((a,b)=>a+b,0)/ords.length;
     const std=Math.sqrt(ords.reduce((s,v)=>s+(v-mean)**2,0)/ords.length);
     allDates=allDates.filter((_,i)=>Math.abs(ords[i]-mid)<=2*std);
-    // Clean serverMap: remove entries for filtered-out dates
     const validDateSet=new Set(allDates);
     for(const srv of Object.keys(serverMap)){
       for(const d of Object.keys(serverMap[srv])){
@@ -761,16 +802,11 @@ function analyseProgress(){
   document.getElementById('pickerPanel').style.display='block';
   document.getElementById('pickerBody').classList.add('open');
   document.getElementById('pickerChevron').classList.add('open');
-  document.getElementById('progSubtabs').style.display='flex'; // ★ show sub-tabs
-  renderProgressSummary();
-  renderPickerChips();
-  renderProgressTable();
-  renderInsights(); // ★ build insights
+  document.getElementById('progSubtabs').style.display='flex';
+  renderProgressSummary();renderPickerChips();renderProgressTable();renderInsights();
 }
-
 function renderProgressSummary(){
-  const bar=document.getElementById('progSummary');
-  bar.style.display='flex';
+  const bar=document.getElementById('progSummary');bar.style.display='flex';
   let improved=0,declined=0,stable=0,spamCount=0;
   for(const[srv,days]of Object.entries(serverMap)){
     const vals=allDates.map(d=>days[d]).filter(Boolean);
@@ -788,220 +824,66 @@ function renderProgressSummary(){
     <div class="sum-chip"><div class="sum-chip-val">→ ${stable}</div><div class="sum-chip-label">Stable</div></div>
     <div class="sum-chip warn"><div class="sum-chip-val">⚠ ${spamCount}</div><div class="sum-chip-label">Had Spam</div></div>`;
 }
-function getPTrend(s){
-  const days=serverMap[s];
-  const vals=allDates.map(d=>days[d]).filter(Boolean).filter(v=>v!=='spam');
-  if(vals.length<2)return'same';
-  const f=lvRank(vals[0]),l=lvRank(vals[vals.length-1]);
-  return l>f?'up':l<f?'dn':'same';
-}
+function getPTrend(s){const days=serverMap[s];const vals=allDates.map(d=>days[d]).filter(Boolean).filter(v=>v!=='spam');if(vals.length<2)return'same';const f=lvRank(vals[0]),l=lvRank(vals[vals.length-1]);return l>f?'up':l<f?'dn':'same';}
 function hasSpam(s){return allDates.some(d=>serverMap[s][d]==='spam');}
-function isMixed(s){
-  const vals=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
-  if(vals.length<2)return false;
-  let ups=0,dns=0;
-  for(let i=1;i<vals.length;i++){const d=lvRank(vals[i])-lvRank(vals[i-1]);if(d>0)ups++;else if(d<0)dns++;}
-  return ups>0&&dns>0;
-}
-
-// ★ NEW: Insights date range state
-let insightDays=0; // 0 = all
-let insightScope='all'; // 'all' or 'managed'
-function setInsightScope(scope,btn){
-  insightScope=scope;
-  document.querySelectorAll('.insights-scope-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderInsights();
-}
-function getInsightServers(allServers){
-  if(insightScope==='managed'){
-    const managed=new Set(lsLoad());
-    const filtered=allServers.filter(s=>managed.has(s));
-    return filtered.length>0?filtered:allServers; // fallback to all if none match
-  }
-  return allServers;
-}
-function setInsightRange(n,btn){
-  insightDays=n;
-  document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderInsights();
-}
-function getInsightDates(){
-  if(!insightDays||insightDays>=allDates.length)return allDates;
-  return allDates.slice(-insightDays);
-}
-
-// ★ NEW: Insights renderer
+function isMixed(s){const vals=allDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');if(vals.length<2)return false;let ups=0,dns=0;for(let i=1;i<vals.length;i++){const d=lvRank(vals[i])-lvRank(vals[i-1]);if(d>0)ups++;else if(d<0)dns++;}return ups>0&&dns>0;}
+let insightDays=0,insightScope='all';
+function setInsightScope(scope,btn){insightScope=scope;document.querySelectorAll('.insights-scope-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderInsights();}
+function setInsightRange(n,btn){insightDays=n;document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderInsights();}
+function getInsightDates(){if(!insightDays||insightDays>=allDates.length)return allDates;return allDates.slice(-insightDays);}
 function renderInsights(){
   const allServers=Object.keys(serverMap);
   const managed=new Set(lsLoad());
-  const servers=insightScope==='managed'&&managed.size>0
-    ? allServers.filter(s=>managed.has(s))
-    : allServers;
+  const servers=insightScope==='managed'&&managed.size>0?allServers.filter(s=>managed.has(s)):allServers;
   const useDates=getInsightDates();
-
-  // Update info label
   const infoEl=document.getElementById('insightsRangeInfo');
-  if(infoEl){
-    const dateStr=useDates.length===allDates.length?`all ${allDates.length} dates`:`${useDates.length}/${allDates.length} dates`;
-    const scopeStr=insightScope==='managed'&&managed.size>0?` · ${servers.length} managed servers`:` · ${servers.length} servers`;
-    infoEl.textContent=dateStr+scopeStr;
-  }
-
-  // Show the range bar
-  const rangeBar=document.getElementById('insightsRangeBar');
-  if(rangeBar)rangeBar.style.display='block';
-
-  // 1. Never inboxed — spam on every day in the selected window (must appear on ALL days as spam)
-  const neverInboxed=servers.filter(s=>{
-    // Must have an entry on every date in the window, and every entry must be spam
-    return useDates.length>0&&useDates.every(d=>serverMap[s][d]==='spam');
-  });
-
-  // 2. Consistently improving — every step is up or flat, at least one real up
-  const steadyUp=servers.filter(s=>{
-    const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
-    if(vals.length<2)return false;
-    let hasUp=false;
-    for(let i=1;i<vals.length;i++){
-      const diff=lvRank(vals[i])-lvRank(vals[i-1]);
-      if(diff<0)return false;
-      if(diff>0)hasUp=true;
-    }
-    return hasUp;
-  });
-
-  // 3. Peaked then dropped — reached max before last entry, then went down
-  const peaked=servers.filter(s=>{
-    const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
-    if(vals.length<3)return false;
-    const ranks=vals.map(lvRank);
-    const maxIdx=ranks.indexOf(Math.max(...ranks));
-    if(maxIdx===0||maxIdx===ranks.length-1)return false;
-    return ranks.slice(maxIdx+1).some(r=>r<ranks[maxIdx]);
-  });
-
-  // 4. Unstable / bouncing — goes both up AND down (mixed), but not peaked
-  const unstable=servers.filter(s=>{
-    const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');
-    if(vals.length<2)return false;
-    let ups=0,dns=0;
-    for(let i=1;i<vals.length;i++){const d=lvRank(vals[i])-lvRank(vals[i-1]);if(d>0)ups++;else if(d<0)dns++;}
-    return ups>0&&dns>0&&!peaked.includes(s);
-  });
-
-  // 5. Spam by day map
-  const spamByDay={};
-  useDates.forEach(d=>{spamByDay[d]=servers.filter(s=>serverMap[s][d]==='spam');});
-
+  if(infoEl){const dateStr=useDates.length===allDates.length?`all ${allDates.length} dates`:`${useDates.length}/${allDates.length} dates`;const scopeStr=insightScope==='managed'&&managed.size>0?` · ${servers.length} managed servers`:` · ${servers.length} servers`;infoEl.textContent=dateStr+scopeStr;}
+  const rangeBar=document.getElementById('insightsRangeBar');if(rangeBar)rangeBar.style.display='block';
+  const neverInboxed=servers.filter(s=>useDates.length>0&&useDates.every(d=>serverMap[s][d]==='spam'));
+  const steadyUp=servers.filter(s=>{const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');if(vals.length<2)return false;let hasUp=false;for(let i=1;i<vals.length;i++){const diff=lvRank(vals[i])-lvRank(vals[i-1]);if(diff<0)return false;if(diff>0)hasUp=true;}return hasUp;});
+  const peaked=servers.filter(s=>{const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');if(vals.length<3)return false;const ranks=vals.map(lvRank);const maxIdx=ranks.indexOf(Math.max(...ranks));if(maxIdx===0||maxIdx===ranks.length-1)return false;return ranks.slice(maxIdx+1).some(r=>r<ranks[maxIdx]);});
+  const unstable=servers.filter(s=>{const vals=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(v=>v!=='spam');if(vals.length<2)return false;let ups=0,dns=0;for(let i=1;i<vals.length;i++){const d=lvRank(vals[i])-lvRank(vals[i-1]);if(d>0)ups++;else if(d<0)dns++;}return ups>0&&dns>0&&!peaked.includes(s);});
+  const spamByDay={};useDates.forEach(d=>{spamByDay[d]=servers.filter(s=>serverMap[s][d]==='spam');});
   const cats=[
-    {key:'never',icon:'🚫',title:'Never Reached Inbox',desc:'Spam on every day in the selected date range',servers:neverInboxed,
-     getBadge:s=>{const n=useDates.filter(d=>serverMap[s][d]==='spam').length;return{text:'spam '+n+'/'+useDates.length+' days',bg:'#fee2e2',fg:'#991b1b'};}},
-    {key:'steady',icon:'📈',title:'Consistently Improving',desc:'Level went up every single recorded day',servers:steadyUp,
-     getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');return{text:v[0]+' → '+v[v.length-1],bg:'#d1fae5',fg:'#065f46'};}},
-    {key:'peaked',icon:'📉',title:'Peaked & Dropped',desc:'Hit a high level then fell back down',servers:peaked,
-     getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');const r=v.map(lvRank);const pk=v[r.indexOf(Math.max(...r))];return{text:'peak:'+pk+' → '+v[v.length-1],bg:'#fef3c7',fg:'#92400e'};}},
-    {key:'unstable',icon:'↕️',title:'Unstable / Bouncing',desc:'Level jumping up and down inconsistently',servers:unstable,
-     getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');let u=0,dn=0;for(let i=1;i<v.length;i++){const d=lvRank(v[i])-lvRank(v[i-1]);if(d>0)u++;else if(d<0)dn++;}return{text:'↑'+u+' ↓'+dn,bg:'#ede9fe',fg:'#6d28d9'};}}
+    {key:'never',icon:'🚫',title:'Never Reached Inbox',desc:'Spam on every day in the selected date range',servers:neverInboxed,getBadge:s=>{const n=useDates.filter(d=>serverMap[s][d]==='spam').length;return{text:'spam '+n+'/'+useDates.length+' days',bg:'#fee2e2',fg:'#991b1b'};}},
+    {key:'steady',icon:'📈',title:'Consistently Improving',desc:'Level went up every single recorded day',servers:steadyUp,getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');return{text:v[0]+' → '+v[v.length-1],bg:'#d1fae5',fg:'#065f46'};}},
+    {key:'peaked',icon:'📉',title:'Peaked & Dropped',desc:'Hit a high level then fell back down',servers:peaked,getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');const r=v.map(lvRank);const pk=v[r.indexOf(Math.max(...r))];return{text:'peak:'+pk+' → '+v[v.length-1],bg:'#fef3c7',fg:'#92400e'};}},
+    {key:'unstable',icon:'↕️',title:'Unstable / Bouncing',desc:'Level jumping up and down inconsistently',servers:unstable,getBadge:s=>{const v=useDates.map(d=>serverMap[s][d]).filter(Boolean).filter(x=>x!=='spam');let u=0,dn=0;for(let i=1;i<v.length;i++){const d=lvRank(v[i])-lvRank(v[i-1]);if(d>0)u++;else if(d<0)dn++;}return{text:'↑'+u+' ↓'+dn,bg:'#ede9fe',fg:'#6d28d9'};}}
   ];
-
   let html='<div class="insights-grid">';
   cats.forEach(cat=>{
-    html+=`<div class="insight-card ${cat.key}">
-      <div class="insight-card-head">
-        <span class="insight-card-icon">${cat.icon}</span>
-        <div class="insight-card-info">
-          <div class="insight-card-title">${cat.title}</div>
-          <div class="insight-card-desc">${cat.desc}</div>
-        </div>
-        <span class="insight-count-badge">${cat.servers.length}</span>
-      </div>
-      <div class="insight-card-body">`;
-    if(!cat.servers.length){
-      html+='<div style="text-align:center;padding:20px 0;color:var(--text3);font-size:.75rem">✓ None found</div>';
-    } else {
-      html+='<div class="insight-srv-list">';
-      cat.servers.slice().sort().forEach(s=>{
-        const b=cat.getBadge(s);
-        html+=`<div class="insight-srv-item"><span>${esc(s)}</span><span class="insight-srv-badge" style="background:${b.bg};color:${b.fg}">${esc(b.text)}</span></div>`;
-      });
-      html+='</div>';
-    }
+    html+=`<div class="insight-card ${cat.key}"><div class="insight-card-head"><span class="insight-card-icon">${cat.icon}</span><div class="insight-card-info"><div class="insight-card-title">${cat.title}</div><div class="insight-card-desc">${cat.desc}</div></div><span class="insight-count-badge">${cat.servers.length}</span></div><div class="insight-card-body">`;
+    if(!cat.servers.length){html+='<div style="text-align:center;padding:20px 0;color:var(--text3);font-size:.75rem">✓ None found</div>';}
+    else{html+='<div class="insight-srv-list">';cat.servers.slice().sort().forEach(s=>{const b=cat.getBadge(s);html+=`<div class="insight-srv-item"><span>${esc(s)}</span><span class="insight-srv-badge" style="background:${b.bg};color:${b.fg}">${esc(b.text)}</span></div>`;});html+='</div>';}
     html+='</div></div>';
   });
   html+='</div>';
-
-  // Spam by Day section
   const total=servers.length;
   html+='<div class="spam-by-day-section"><div class="spam-byday-head"><span class="spam-byday-icon">📅</span><div class="spam-byday-text"><div class="spam-byday-title">Spam Per Day</div><div class="spam-byday-sub">Which servers were spam on each date — spot problem patterns</div></div></div><div class="spam-days-wrap">';
   useDates.forEach((d,i)=>{
-    const sp=spamByDay[d]||[];
-    const pct=total>0?((sp.length/total)*100).toFixed(0):0;
-    html+=`<div class="spam-day-block">
-      <div class="spam-day-header" onclick="toggleSpamDay('sd${i}')">
-        <span class="spam-day-date">${fmtDate(d)}</span>
-        <span class="spam-day-cnt">${sp.length} spam</span>
-        <span class="spam-day-pct">${pct}% of total</span>
-        <span class="spam-day-chevron" id="sdch${i}">▼</span>
-      </div>
-      <div class="spam-day-body" id="sd${i}">`;
-    if(sp.length){
-      html+='<div class="spam-day-chips">'+sp.sort().map(s=>`<span class="spam-day-chip">${esc(s)}</span>`).join('')+'</div>';
-    } else {
-      html+='<div class="no-spam-day">✓ No spam on this date</div>';
-    }
+    const sp=spamByDay[d]||[];const pct=total>0?((sp.length/total)*100).toFixed(0):0;
+    html+=`<div class="spam-day-block"><div class="spam-day-header" onclick="toggleSpamDay('sd${i}')"><span class="spam-day-date">${fmtDate(d)}</span><span class="spam-day-cnt">${sp.length} spam</span><span class="spam-day-pct">${pct}% of total</span><span class="spam-day-chevron" id="sdch${i}">▼</span></div><div class="spam-day-body" id="sd${i}">`;
+    if(sp.length){html+='<div class="spam-day-chips">'+sp.sort().map(s=>`<span class="spam-day-chip">${esc(s)}</span>`).join('')+'</div>';}
+    else{html+='<div class="no-spam-day">✓ No spam on this date</div>';}
     html+='</div></div>';
   });
   html+='</div></div>';
-
   document.getElementById('insightsContent').innerHTML=html;
 }
-
-// ★ NEW: toggle spam day accordion
-function toggleSpamDay(id){
-  const body=document.getElementById(id);
-  const idx=id.replace('sd','');
-  const chev=document.getElementById('sdch'+idx);
-  const open=body.classList.toggle('open');
-  if(chev)chev.classList.toggle('open',open);
-}
-
-function setPFilter(f,btn){
-  activeFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderProgressTable();
-}
-function togglePickerBody(){
-  pickerBodyOpen=!pickerBodyOpen;
-  document.getElementById('pickerBody').classList.toggle('open',pickerBodyOpen);
-  document.getElementById('pickerChevron').classList.toggle('open',pickerBodyOpen);
-}
+function toggleSpamDay(id){const body=document.getElementById(id);const idx=id.replace('sd','');const chev=document.getElementById('sdch'+idx);const open=body.classList.toggle('open');if(chev)chev.classList.toggle('open',open);}
+function setPFilter(f,btn){activeFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderProgressTable();}
+function togglePickerBody(){pickerBodyOpen=!pickerBodyOpen;document.getElementById('pickerBody').classList.toggle('open',pickerBodyOpen);document.getElementById('pickerChevron').classList.toggle('open',pickerBodyOpen);}
 function renderPickerChips(){
   const q=document.getElementById('pickerSearch').value.trim().toLowerCase();
   const all=Object.keys(serverMap).sort();
   const filtered=q?all.filter(s=>s.toLowerCase().includes(q)):all;
-  document.getElementById('pickerGrid').innerHTML=filtered.map(s=>{
-    const sel=selectedServers.has(s);
-    const trend=getPTrend(s);
-    const icon=hasSpam(s)?'⚠':trend==='up'?'↑':trend==='dn'?'↓':'→';
-    return`<div class="srv-chip-sel ${sel?'selected':''}" onclick="toggleSrvSel('${esc(s)}')"><span class="chip-trend">${icon}</span>${esc(s)}</div>`;
-  }).join('');
+  document.getElementById('pickerGrid').innerHTML=filtered.map(s=>{const sel=selectedServers.has(s);const trend=getPTrend(s);const icon=hasSpam(s)?'⚠':trend==='up'?'↑':trend==='dn'?'↓':'→';return`<div class="srv-chip-sel ${sel?'selected':''}" onclick="toggleSrvSel('${esc(s)}')"><span class="chip-trend">${icon}</span>${esc(s)}</div>`;}).join('');
   updatePickerMeta();
 }
-function toggleSrvSel(name){
-  if(selectedServers.has(name))selectedServers.delete(name);else selectedServers.add(name);
-  renderPickerChips();renderProgressTable();
-}
+function toggleSrvSel(name){if(selectedServers.has(name))selectedServers.delete(name);else selectedServers.add(name);renderPickerChips();renderProgressTable();}
 function pickerSelectAll(){Object.keys(serverMap).forEach(s=>selectedServers.add(s));renderPickerChips();renderProgressTable();}
 function pickerClear(){selectedServers.clear();renderPickerChips();renderProgressTable();}
-function updatePickerMeta(){
-  const total=Object.keys(serverMap).length,sel=selectedServers.size;
-  const el=document.getElementById('pickerMeta');
-  if(sel===0){el.textContent=`All ${total} servers`;el.classList.remove('has-sel');}
-  else{el.textContent=`${sel} / ${total} selected`;el.classList.add('has-sel');}
-}
+function updatePickerMeta(){const total=Object.keys(serverMap).length,sel=selectedServers.size;const el=document.getElementById('pickerMeta');if(sel===0){el.textContent=`All ${total} servers`;el.classList.remove('has-sel');}else{el.textContent=`${sel} / ${total} selected`;el.classList.add('has-sel');}}
 function renderProgressTable(){
   let servers=Object.keys(serverMap).sort();
   servers=servers.filter(s=>{
@@ -1012,22 +894,11 @@ function renderProgressTable(){
     if(activeFilter==='stable')return getPTrend(s)==='same'&&!isMixed(s);
     return true;
   });
-  if(!servers.length){
-    document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">🔍</div><p>No servers match this filter</p></div>`;
-    return;
-  }
+  if(!servers.length){document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">🔍</div><p>No servers match this filter</p></div>`;return;}
   const dateHeaders=allDates.map(d=>`<th class="date-col">${fmtDate(d)}</th>`).join('');
   const rows=servers.map(srv=>{
-    const days=serverMap[srv];
-    const trend=getPTrend(srv);
-    const mixed=isMixed(srv);
-    const cells=allDates.map((d,i)=>{
-      const lv=days[d];
-      if(!lv)return`<td><span class="lv-empty">—</span></td>`;
-      let arrow='';
-      if(i>0){const prev=allDates.slice(0,i).reverse().find(pd=>days[pd]);if(prev){const diff=lvRank(lv)-lvRank(days[prev]);if(diff>0)arrow=`<span class="trend up">▲</span>`;else if(diff<0)arrow=`<span class="trend dn">▼</span>`;else arrow=`<span class="trend same">—</span>`;}}
-      return`<td><div class="level-cell"><span class="level-badge ${badgeCls(lv)}">${lv}</span>${arrow}</div></td>`;
-    }).join('');
+    const days=serverMap[srv];const trend=getPTrend(srv);const mixed=isMixed(srv);
+    const cells=allDates.map((d,i)=>{const lv=days[d];if(!lv)return`<td><span class="lv-empty">—</span></td>`;let arrow='';if(i>0){const prev=allDates.slice(0,i).reverse().find(pd=>days[pd]);if(prev){const diff=lvRank(lv)-lvRank(days[prev]);if(diff>0)arrow=`<span class="trend up">▲</span>`;else if(diff<0)arrow=`<span class="trend dn">▼</span>`;else arrow=`<span class="trend same">—</span>`;}}return`<td><div class="level-cell"><span class="level-badge ${badgeCls(lv)}">${lv}</span>${arrow}</div></td>`;}).join('');
     let trendBadge;
     if(mixed)trendBadge=`<span class="trend-summary mixed">↕ Mixed</span>`;
     else if(trend==='up')trendBadge=`<span class="trend-summary up">↑ Improving</span>`;
@@ -1035,9 +906,7 @@ function renderProgressTable(){
     else trendBadge=`<span class="trend-summary same">→ Stable</span>`;
     return`<tr><td class="sticky-col">${esc(srv)}</td>${cells}<td class="trend-col">${trendBadge}</td></tr>`;
   }).join('');
-  document.getElementById('progTable').innerHTML=`<div class="table-scroll"><table class="prog-table">
-    <thead><tr><th class="sticky-col">Server</th>${dateHeaders}<th style="text-align:center">Trend</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>`;
+  document.getElementById('progTable').innerHTML=`<div class="table-scroll"><table class="prog-table"><thead><tr><th class="sticky-col">Server</th>${dateHeaders}<th style="text-align:center">Trend</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 function resetProgress(){
   document.getElementById('progInput').value='';
@@ -1046,25 +915,33 @@ function resetProgress(){
   document.getElementById('pickerPanel').style.display='none';
   document.getElementById('pickerGrid').innerHTML='';
   document.getElementById('pickerSearch').value='';
-  document.getElementById('progSubtabs').style.display='none'; // ★ hide sub-tabs
+  document.getElementById('progSubtabs').style.display='none';
   document.getElementById('progTable').innerHTML=`<div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Analyse</p></div>`;
-  document.getElementById('insightsContent').innerHTML=`<div class="insights-empty"><div class="ico">🔬</div><p>Analyse data first to see insights</p></div>`; // ★ reset insights
+  document.getElementById('insightsContent').innerHTML=`<div class="insights-empty"><div class="ico">🔬</div><p>Analyse data first to see insights</p></div>`;
   document.getElementById('insightsRangeBar').style.display='none';
   insightDays=0;insightScope='all';
   document.querySelectorAll('.insights-range-btn').forEach(b=>b.classList.remove('active'));
   const allBtn=document.querySelector('.insights-range-btn:last-of-type');if(allBtn)allBtn.classList.add('active');
   document.getElementById('scopeBtnAll')?.classList.add('active');
   document.getElementById('scopeBtnManaged')?.classList.remove('active');
-  document.querySelectorAll('.insights-scope-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
-  serverMap={};allDates=[];selectedServers=new Set();
-  // reset sub-tab back to table
   document.querySelectorAll('.prog-subtab').forEach((b,i)=>b.classList.toggle('active',i===0));
   document.querySelectorAll('.prog-subpanel').forEach((p,i)=>p.classList.toggle('active',i===0));
   document.querySelectorAll('#progFilters .filter-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
+  serverMap={};allDates=[];selectedServers=new Set();
 }
 
 // ══════════════════════════════════════════════════════════════ PERFORMANCE
-let pfBlocks=[], pfStatusF='all', pfIPF='all', selStatusF='all', selSearch='', selSelected=null;
+// ── Domain detection helper ──────────────────────────────────────────────────
+// Returns domain string if RPath has a real domain, null if [RDNS] or absent
+function detectDomain(blockText){
+  const m=blockText.match(/RPath\s*:\s*([^\s\n\r\[]+)/i);
+  if(!m)return null;
+  const v=m[1].trim();
+  if(!v||v.toLowerCase()==='[rdns]'||!v.includes('.'))return null;
+  return v;
+}
+
+let pfBlocks=[],pfStatusF='all',pfIPF='all',pfDomainF='all',selStatusF='all',selSearch='',selSelected=null;
 function parsePerf(){
   const raw=document.getElementById('perfInput').value.trim();
   if(!raw)return;
@@ -1080,7 +957,8 @@ function parsePerf(){
   if(!chunks.length){alert('No blocks detected.');return;}
   chunks.forEach(chunk=>{
     const ls=chunk.split('\n').map(l=>l.trim()).filter(Boolean);
-    const b={datetime:'',team:'',level:'',byIP:0,servers:[]};
+    // ── CHANGE 1: added domain:'' to block object ──
+    const b={datetime:'',team:'',level:'',byIP:0,domain:'',servers:[]};
     ls.forEach(line=>{
       let m=line.match(/^TEAM:\s*([^|]+?)(?:\s*\|\s*(.+))?$/);
       if(m){b.team=m[1].trim();b.level=(m[2]||'').trim();return;}
@@ -1088,6 +966,9 @@ function parsePerf(){
       if(m){b.datetime=m[1].trim();return;}
       m=line.match(/By IP:\s*([\d,]+)/i);
       if(m){b.byIP=parseInt(m[1].replace(/,/g,''));return;}
+      // ── CHANGE 2: detect domain from RPath line ──
+      m=line.match(/RPath\s*:\s*([^\s\n\r\[]+)/i);
+      if(m){const v=m[1].trim();if(v&&v.toLowerCase()!=='[rdns]'&&v.includes('.'))b.domain=v;return;}
       m=line.match(/🟢\s*(\S+?):\s*([\d,]+)\s+([\d,]+)/);
       if(m){
         const name=m[1].replace(/:$/,'');
@@ -1095,8 +976,7 @@ function parsePerf(){
         const sent=parseInt(m[3].replace(/,/g,''));
         const pct=target>0?sent/target*100:0;
         const cls=pct>=100?'cl-exc':pct>=70?'cl-good':pct>=60?'cl-warn':'cl-bad';
-        b.servers.push({name,target,sent,pct,cls,down:false});
-        return;
+        b.servers.push({name,target,sent,pct,cls,down:false});return;
       }
       m=line.match(/💥\s*(\S+)/);
       if(m){b.servers.push({name:m[1].replace(/:.*/,''),target:0,sent:0,pct:0,cls:'cl-bad',down:true});return;}
@@ -1104,12 +984,10 @@ function parsePerf(){
     if(b.servers.length||b.datetime)pfBlocks.push(b);
   });
   if(!pfBlocks.length){alert('No valid blocks found.');return;}
-  selSelected=null;selSearch='';selStatusF='all';pfStatusF='all';pfIPF='all';
+  selSelected=null;selSearch='';selStatusF='all';pfStatusF='all';pfIPF='all';pfDomainF='all';
   document.getElementById('selSearchInput').value='';
   document.querySelectorAll('.sel-ftab').forEach((b,i)=>b.classList.toggle('active',i===0));
-  renderSelPanel();
-  renderFilterBar();
-  renderBlocks();
+  renderSelPanel();renderFilterBar();renderBlocks();
   document.getElementById('selPanel').style.display='block';
   document.getElementById('pfFilterBar').style.display='flex';
   document.getElementById('selBody').classList.add('open');
@@ -1123,12 +1001,7 @@ function srvStatus(name){
   const avg=occs.reduce((a,s)=>a+s.pct,0)/occs.length;
   return avg>=70?'g':avg>=60?'w':'b';
 }
-function toggleSelPanel(){
-  const body=document.getElementById('selBody');
-  const chev=document.getElementById('selChevron');
-  const open=body.classList.toggle('open');
-  chev.classList.toggle('open',open);
-}
+function toggleSelPanel(){const body=document.getElementById('selBody');const chev=document.getElementById('selChevron');const open=body.classList.toggle('open');chev.classList.toggle('open',open);}
 function renderSelPanel(){
   const srvMap=new Map();
   pfBlocks.forEach(b=>b.servers.forEach(s=>{srvMap.set(s.name,(srvMap.get(s.name)||0)+1);}));
@@ -1147,8 +1020,7 @@ function renderSelPanel(){
 function selDoSearch(){selSearch=document.getElementById('selSearchInput').value.toLowerCase();renderSelGridFiltered();}
 function selSetStatus(s,btn){selStatusF=s;document.querySelectorAll('.sel-ftab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderSelGridFiltered();}
 function renderSelGridFiltered(){
-  const srvMap=new Map();
-  pfBlocks.forEach(b=>b.servers.forEach(s=>{srvMap.set(s.name,(srvMap.get(s.name)||0)+1);}));
+  const srvMap=new Map();pfBlocks.forEach(b=>b.servers.forEach(s=>{srvMap.set(s.name,(srvMap.get(s.name)||0)+1);}));
   let all=[...srvMap.entries()].map(([name,occ])=>({name,occ,st:srvStatus(name)})).sort((a,b)=>a.name.localeCompare(b.name));
   if(selStatusF!=='all')all=all.filter(s=>s.st===selStatusF);
   if(selSearch)all=all.filter(s=>s.name.toLowerCase().includes(selSearch));
@@ -1172,58 +1044,32 @@ function showSelTl(name){
   const st=srvStatus(name);
   const stLabel={g:'GOOD',w:'WARNING',b:'BAD'}[st];
   document.getElementById('selTlName').textContent=name;
-  const badge=document.getElementById('selTlBadge');
-  badge.textContent=stLabel;badge.className='sel-tl-badge '+st;
+  const badge=document.getElementById('selTlBadge');badge.textContent=stLabel;badge.className='sel-tl-badge '+st;
   const colors={g:'#10b981',w:'#f59e0b',b:'#ef4444'};
-  const occs=pfBlocks.flatMap(b=>{
-    const s=b.servers.find(sv=>sv.name===name);
-    return s?[{...s,datetime:b.datetime}]:[];
-  });
+  const occs=pfBlocks.flatMap(b=>{const s=b.servers.find(sv=>sv.name===name);return s?[{...s,datetime:b.datetime}]:[];});
   document.getElementById('selTlRows').innerHTML=occs.map(o=>{
-    if(o.down){
-      return`<div class="sel-tl-row" style="border-color:#ef4444">
-        <div class="sel-tl-time">⏱ ${esc(o.datetime)}</div>
-        <div style="flex:1;color:#ef4444;font-weight:700;font-size:.85rem;">💥 SERVER DOWN</div>
-        <div class="sel-tl-pct" style="color:#ef4444">—</div>
-      </div>`;
-    }
+    if(o.down){return`<div class="sel-tl-row" style="border-color:#ef4444"><div class="sel-tl-time">⏱ ${esc(o.datetime)}</div><div style="flex:1;color:#ef4444;font-weight:700;font-size:.85rem;">💥 SERVER DOWN</div><div class="sel-tl-pct" style="color:#ef4444">—</div></div>`;}
     const col=o.cls==='cl-exc'?colors.g:o.cls==='cl-good'?colors.g:o.cls==='cl-warn'?colors.w:colors.b;
     const pctColor=o.pct>=70?colors.g:o.pct>=60?colors.w:colors.b;
-    return`<div class="sel-tl-row" style="border-color:${col}">
-      <div class="sel-tl-time">⏱ ${esc(o.datetime)}</div>
-      <div class="sel-tl-vals">
-        <div class="sel-tl-val"><div class="sel-tl-lbl">TARGET</div><div class="sel-tl-num">${o.target.toLocaleString()}</div></div>
-        <div class="sel-tl-val"><div class="sel-tl-lbl">SENT</div><div class="sel-tl-num" style="color:${col}">${o.sent.toLocaleString()}</div></div>
-      </div>
-      <div class="sel-tl-pct" style="color:${pctColor}">${o.pct.toFixed(1)}%</div>
-    </div>`;
+    return`<div class="sel-tl-row" style="border-color:${col}"><div class="sel-tl-time">⏱ ${esc(o.datetime)}</div><div class="sel-tl-vals"><div class="sel-tl-val"><div class="sel-tl-lbl">TARGET</div><div class="sel-tl-num">${o.target.toLocaleString()}</div></div><div class="sel-tl-val"><div class="sel-tl-lbl">SENT</div><div class="sel-tl-num" style="color:${col}">${o.sent.toLocaleString()}</div></div></div><div class="sel-tl-pct" style="color:${pctColor}">${o.pct.toFixed(1)}%</div></div>`;
   }).join('');
   document.getElementById('selTlPanel').style.display='block';
 }
 function renderFilterBar(){
   const ips=[...new Set(pfBlocks.map(b=>b.byIP).filter(Boolean))].sort((a,b)=>a-b);
   const ipGrp=document.getElementById('pfIPGroup');
-  ipGrp.innerHTML=ips.length
-    ?`<span class="pf-glabel">By IP:</span>
-       <button class="pf-ipbtn active" onclick="pfSetIP('all',this)">ALL</button>
-       ${ips.map(ip=>`<button class="pf-ipbtn" onclick="pfSetIP(${ip},this)">${Number(ip).toLocaleString()}</button>`).join('')}`
-    :'';
+  ipGrp.innerHTML=ips.length?`<span class="pf-glabel">By IP:</span><button class="pf-ipbtn active" onclick="pfSetIP('all',this)">ALL</button>${ips.map(ip=>`<button class="pf-ipbtn" onclick="pfSetIP(${ip},this)">${Number(ip).toLocaleString()}</button>`).join('')}`:'';
+  const domains=[...new Set(pfBlocks.map(b=>b.domain).filter(Boolean))].sort();
+  const domGrp=document.getElementById('pfDomainGroup');
+  domGrp.innerHTML=domains.length?`<span class="pf-glabel">🔗 Domain:</span><button class="pf-dombtn active" onclick="pfSetDomain('all',this)">ALL</button>${domains.map(d=>`<button class="pf-dombtn" onclick="pfSetDomain('${d.replace(/'/g,"\\'")}',this)">${esc(d)}</button>`).join('')}`:'';
 }
-function pfSetStatus(s,btn){
-  pfStatusF=s;
-  document.querySelectorAll('.pf-sbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderBlocks();
-}
-function pfSetIP(v,btn){
-  pfIPF=v==='all'?'all':Number(v);
-  document.querySelectorAll('.pf-ipbtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  renderBlocks();
-}
+function pfSetDomain(v,btn){pfDomainF=v;document.querySelectorAll('.pf-dombtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBlocks();}
+function pfSetStatus(s,btn){pfStatusF=s;document.querySelectorAll('.pf-sbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBlocks();}
+function pfSetIP(v,btn){pfIPF=v==='all'?'all':Number(v);document.querySelectorAll('.pf-ipbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBlocks();}
 function renderBlocks(){
   let blocks=pfBlocks;
   if(pfIPF!=='all')blocks=blocks.filter(b=>b.byIP===pfIPF);
+  if(pfDomainF!=='all')blocks=blocks.filter(b=>b.domain===pfDomainF);
   const container=document.getElementById('pfResults');
   if(!blocks.length){container.innerHTML='<div class="empty-state"><div class="ico">🔍</div><p>No blocks match filter</p></div>';return;}
   const html=blocks.map((block,bi)=>{
@@ -1232,33 +1078,20 @@ function renderBlocks(){
     else if(pfStatusF==='bad')srvs=srvs.filter(s=>s.down||s.pct<60);
     if(!srvs.length)return'';
     const cards=srvs.map(s=>{
-      if(s.down)return`<div class="pf-card cl-down" onclick="selClickServer('${esc(s.name)}')">
-        <div class="pf-card-top">
-          <span class="pf-cname">☰ ${esc(s.name)}</span>
-          <span class="pf-cstatus cl-down">DOWN</span>
-        </div>
-        <div style="color:#ef4444;text-align:center;padding:10px;font-size:.82rem;font-weight:700;">💥 Server Down</div>
-      </div>`;
+      if(s.down)return`<div class="pf-card cl-down" onclick="selClickServer('${esc(s.name)}')"><div class="pf-card-top"><span class="pf-cname">☰ ${esc(s.name)}</span><span class="pf-cstatus cl-down">DOWN</span></div><div style="color:#ef4444;text-align:center;padding:10px;font-size:.82rem;font-weight:700;">💥 Server Down</div></div>`;
       const statusLabel=s.cls==='cl-exc'?'EXCELLENT':s.cls==='cl-good'?'GOOD':s.cls==='cl-warn'?'WARNING':'BAD';
-      return`<div class="pf-card ${s.cls}" onclick="selClickServer('${esc(s.name)}')">
-        <div class="pf-card-top">
-          <span class="pf-cname">☰ ${esc(s.name)}</span>
-          <span class="pf-cstatus ${s.cls}">${statusLabel}</span>
-        </div>
-        <div class="pf-cstats">
-          <div class="pf-cstat"><div class="pf-cslbl">TARGET</div><div class="pf-csval">${s.target.toLocaleString()}</div></div>
-          <div class="pf-cstat" style="text-align:right"><div class="pf-cslbl">SENT</div><div class="pf-csval ${s.cls}">${s.sent.toLocaleString()}</div></div>
-        </div>
-        <div class="pf-cpbar"><div class="pf-cpfill ${s.cls}" style="width:${Math.min(s.pct,100).toFixed(1)}%"></div></div>
-        <div class="pf-cpct">${s.pct.toFixed(1)}% of target</div>
-      </div>`;
+      return`<div class="pf-card ${s.cls}" onclick="selClickServer('${esc(s.name)}')"><div class="pf-card-top"><span class="pf-cname">☰ ${esc(s.name)}</span><span class="pf-cstatus ${s.cls}">${statusLabel}</span></div><div class="pf-cstats"><div class="pf-cstat"><div class="pf-cslbl">TARGET</div><div class="pf-csval">${s.target.toLocaleString()}</div></div><div class="pf-cstat" style="text-align:right"><div class="pf-cslbl">SENT</div><div class="pf-csval ${s.cls}">${s.sent.toLocaleString()}</div></div></div><div class="pf-cpbar"><div class="pf-cpfill ${s.cls}" style="width:${Math.min(s.pct,100).toFixed(1)}%"></div></div><div class="pf-cpct">${s.pct.toFixed(1)}% of target</div></div>`;
     }).join('');
     if(!cards.trim())return'';
+    // ── CHANGE 3: show domain badge if detected, "No domain" if not ──
+    const domainBadge=block.domain
+      ? `<span class="pf-bdomain">🔗 ${esc(block.domain)}</span>`
+      : `<span class="pf-bnodomain">No domain</span>`;
     return`<div class="pf-block">
       <div class="pf-block-head">
         ${block.datetime?`<span class="pf-btime">⏱ ${esc(block.datetime)}</span>`:''}
         ${block.byIP?`<span class="pf-bip">${Number(block.byIP).toLocaleString()} per IP</span>`:''}
-        <span class="pf-bnodomain">No domain</span>
+        ${domainBadge}
         <button class="pf-bcopy" onclick="pfCopyBlock(${bi},event)">📋 Copy Names</button>
       </div>
       <div class="pf-cards">${cards}</div>
@@ -1268,33 +1101,18 @@ function renderBlocks(){
 }
 function pfCopyAll(){
   let blocks=pfIPF==='all'?pfBlocks:pfBlocks.filter(b=>b.byIP===pfIPF);
-  const names=[...new Set(blocks.flatMap(b=>{
-    let s=b.servers;
-    if(pfStatusF==='good')s=s.filter(x=>!x.down&&x.pct>=70);
-    else if(pfStatusF==='bad')s=s.filter(x=>x.down||x.pct<60);
-    return s.map(x=>x.name);
-  }))];
+  const names=[...new Set(blocks.flatMap(b=>{let s=b.servers;if(pfStatusF==='good')s=s.filter(x=>!x.down&&x.pct>=70);else if(pfStatusF==='bad')s=s.filter(x=>x.down||x.pct<60);return s.map(x=>x.name);}))];
   if(!names.length)return;
-  navigator.clipboard.writeText(names.join('\n')).then(()=>{
-    const btn=document.querySelector('.pf-copy-all');
-    const orig=btn.innerHTML;btn.innerHTML='✅ Copied!';
-    setTimeout(()=>{btn.innerHTML=orig;},2000);
-  });
+  navigator.clipboard.writeText(names.join('\n')).then(()=>{const btn=document.querySelector('.pf-copy-all');const orig=btn.innerHTML;btn.innerHTML='✅ Copied!';setTimeout(()=>{btn.innerHTML=orig;},2000);});
 }
 function pfCopyBlock(bi,e){
-  e.stopPropagation();
-  const block=pfBlocks[bi];if(!block)return;
-  let s=block.servers;
-  if(pfStatusF==='good')s=s.filter(x=>!x.down&&x.pct>=70);
-  else if(pfStatusF==='bad')s=s.filter(x=>x.down||x.pct<60);
-  navigator.clipboard.writeText(s.map(x=>x.name).join('\n')).then(()=>{
-    const btn=e.target;const orig=btn.innerHTML;btn.innerHTML='✅ Copied!';
-    setTimeout(()=>{btn.innerHTML=orig;},2000);
-  });
+  e.stopPropagation();const block=pfBlocks[bi];if(!block)return;
+  let s=block.servers;if(pfStatusF==='good')s=s.filter(x=>!x.down&&x.pct>=70);else if(pfStatusF==='bad')s=s.filter(x=>x.down||x.pct<60);
+  navigator.clipboard.writeText(s.map(x=>x.name).join('\n')).then(()=>{const btn=e.target;const orig=btn.innerHTML;btn.innerHTML='✅ Copied!';setTimeout(()=>{btn.innerHTML=orig;},2000);});
 }
 function resetPerf(){
   document.getElementById('perfInput').value='';
-  pfBlocks=[];pfStatusF='all';pfIPF='all';selSelected=null;selSearch='';selStatusF='all';
+  pfBlocks=[];pfStatusF='all';pfIPF='all';pfDomainF='all';selSelected=null;selSearch='';selStatusF='all';
   document.getElementById('selPanel').style.display='none';
   document.getElementById('pfFilterBar').style.display='none';
   document.getElementById('pfResults').innerHTML='<div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Parse</p></div>';
@@ -1306,75 +1124,5 @@ document.getElementById('newSrv').addEventListener('keydown',e=>{if(e.key==='Ent
 document.getElementById('inputArea').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')parseData();});
 renderDrawer();
 </script>
-
-<div class="panel" id="panel-perf">
-<div class="main">
-  <div class="card" style="margin-bottom:20px">
-    <div class="card-head"><div class="card-title">Input Data</div></div>
-    <div class="hint-text">Paste performance reports. Blocks auto-detected by <strong>TEAM:</strong> or <strong>📅</strong> timestamp lines.</div>
-    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end;">
-      <textarea id="perfInput" style="height:180px" placeholder="TEAM: C | 24K
-📅 18/02 00:04:05
-By IP: 18,000
-🟢 s_cmh6_5787: 90139 1188
-🟢 s_cmh6_5897: 36128 11
-💥 s_cmh6_5999
-❗️ Errors Details:
-Connection closed
-5.79.125.25"></textarea>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="primary" onclick="parsePerf()">▶ Parse</button>
-        <button class="secondary" onclick="resetPerf()">↺</button>
-      </div>
-    </div>
-  </div>
-  <div class="sel-panel" id="selPanel" style="display:none">
-    <div class="sel-header" onclick="toggleSelPanel()">
-      <div class="sel-header-left">
-        <div class="sel-header-title">☰ Server Selector <span class="sel-count-badge" id="selTotalBadge">0 servers</span></div>
-      </div>
-      <span class="sel-chevron" id="selChevron">▼</span>
-    </div>
-    <div class="sel-body" id="selBody">
-      <div class="sel-top-row">
-        <div class="sel-stat-pill g" id="selGoodPill">● 0 Good</div>
-        <div class="sel-stat-pill w" id="selWarnPill">▲ 0 Warning</div>
-        <div class="sel-stat-pill b" id="selBadPill">● 0 Bad</div>
-        <div class="sel-search-wrap">
-          <input type="text" id="selSearchInput" placeholder="Search server name..." oninput="selDoSearch()"/>
-          <button class="sel-search-btn" onclick="selDoSearch()">🔍 Search</button>
-        </div>
-      </div>
-      <div class="sel-ftabs">
-        <div class="sel-ftab active" onclick="selSetStatus('all',this)">☰ All <span class="fcnt" id="selAllCnt">0</span></div>
-        <div class="sel-ftab" onclick="selSetStatus('g',this)">✓ Good <span class="fcnt" id="selGoodCnt">0</span></div>
-        <div class="sel-ftab" onclick="selSetStatus('w',this)">⚠ Warning <span class="fcnt" id="selWarnCnt">0</span></div>
-        <div class="sel-ftab" onclick="selSetStatus('b',this)">✕ Bad <span class="fcnt" id="selBadCnt">0</span></div>
-      </div>
-      <div class="sel-grid" id="selGrid"></div>
-      <div class="sel-tl" id="selTlPanel" style="display:none">
-        <div class="sel-tl-head">
-          <div class="sel-tl-name">☰ <span id="selTlName">–</span></div>
-          <span class="sel-tl-badge" id="selTlBadge">–</span>
-        </div>
-        <div class="sel-tl-rows" id="selTlRows"></div>
-      </div>
-    </div>
-  </div>
-  <div class="pf-filterbar" id="pfFilterBar" style="display:none">
-    <div class="pf-group">
-      <span class="pf-glabel">Status:</span>
-      <button class="pf-sbtn active" onclick="pfSetStatus('all',this)">ALL</button>
-      <button class="pf-sbtn" onclick="pfSetStatus('good',this)">GOOD (≥70%)</button>
-      <button class="pf-sbtn" onclick="pfSetStatus('bad',this)">BAD (Down or &lt;60%)</button>
-    </div>
-    <div class="pf-group" id="pfIPGroup"></div>
-    <button class="pf-copy-all" onclick="pfCopyAll()">📋 Copy Names</button>
-  </div>
-  <div class="pf-blocks" id="pfResults">
-    <div class="empty-state"><div class="ico">📊</div><p>Paste your data above and click Parse</p></div>
-  </div>
-</div>
-</div>
 </body>
 </html>
